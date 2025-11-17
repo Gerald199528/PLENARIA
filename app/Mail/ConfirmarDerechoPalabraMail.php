@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Mail;
+
+use App\Models\DerechoDePalabra;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class ConfirmarDerechoPalabraMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public DerechoDePalabra $derecho,
+        public string $observaciones = ''
+    ) {
+        //
+    }
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Tu solicitud de Derecho de Palabra ha sido confirmada',
+            to: [$this->derecho->email],
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.confirmar-derecho-palabra',
+            with: [
+                'nombre' => $this->derecho->nombre . ' ' . $this->derecho->apellido,
+                'email' => $this->derecho->email,
+                'cedula' => $this->derecho->cedula,
+                'observaciones' => $this->observaciones,
+                'fecha' => now()->format('d/m/Y H:i'),
+            ],
+        );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
+    }
+}
