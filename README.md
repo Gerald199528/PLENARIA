@@ -1,4 +1,10 @@
-Proyecto en ejecución PLENARIA 2.0
+ PLENARIA 2.0
 
+# PLENARIA
 
-Dedicado a todos los concejos municipales de Venezuela 
+![Plenaria App](images/plenaria.png)
+
+## Descripción
+
+PLENARIA es una aplicación para gestionar sesiones municipales, acuerdos, crónicas y más.
+```
