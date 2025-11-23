@@ -124,56 +124,58 @@ final class NoticiaTable extends PowerGridComponent
             Filter::inputText('cronista_nombre')->operators(['contains']),
         ];
     }
+public function actions($row): array
+{
+    $actions = [
+        // Editar
+        Button::add('edit')
+            ->slot('<i class="fas fa-edit"></i>')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->route('admin.noticias.edit', ['noticia' => $row->id])
+            ->attributes(['wire:navigate' => true, 'title' => 'Editar noticia']),
 
-    public function actions($row): array
-    {
-        $actions = [
-            // Editar
-            Button::add('edit')
-                ->slot('<i class="fas fa-edit"></i>')
-                ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
-                ->route('admin.noticias.edit', ['noticia' => $row->id])
-                ->attributes(['wire:navigate' => true]),
+        // Eliminar
+        Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-rose-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-rose-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes(['onclick' => "confirmDeleteNoticia({$row->id})", 'title' => 'Eliminar noticia']),
 
-            // Eliminar
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-rose-600 text-white px-3 py-1 rounded-md hover:bg-rose-700 shadow-sm mr-2')
-                ->attributes(['onclick' => "confirmDeleteNoticia({$row->id})"]),
+        // Ver imagen
+        Button::add('imagen')
+            ->slot('<i class="fas fa-image"></i>')
+            ->class('bg-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-amber-600 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'onclick' => $row->imagen
+                    ? "window.open('" . asset('storage/' . $row->imagen) . "', '_blank')"
+                    : "alert('No hay imagen disponible')",
+                'title' => 'Ver imagen'
+            ]),
+    ];
 
-            // Ver imagen
-            Button::add('imagen')
-                ->slot('<i class="fas fa-image"></i>')
-                ->class('bg-amber-500 text-black px-3 py-1 rounded-md hover:bg-amber-600 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => $row->imagen
-                        ? "window.open('" . asset('storage/' . $row->imagen) . "', '_blank')"
-                        : "alert('No hay imagen disponible')"
-                ]),
-        ];
-
-        // Ver PDF - SOLO SI HAY PDF
-        if ($row->archivo_pdf) {
-            $actions[] = Button::add('pdf')
-                ->slot('<i class="fas fa-file-pdf"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => "window.open('" . asset('storage/' . $row->archivo_pdf) . "', '_blank')"
-                ]);
-        }
-
-        // Ver video - SOLO SI HAY VIDEO (archivo o URL)
-        if ($row->video_url || $row->video_archivo) {
-            $actions[] = Button::add('video')
-                ->slot('<i class="fas fa-play"></i>')
-                ->class('bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => $row->video_url
-                        ? "window.open('" . $row->video_url . "', '_blank')"
-                        : "window.open('" . asset('storage/' . $row->video_archivo) . "', '_blank')"
-                ]);
-        }
-
-        return $actions;
+    // Ver PDF - SOLO SI HAY PDF
+    if ($row->archivo_pdf) {
+        $actions[] = Button::add('pdf')
+            ->slot('<i class="fas fa-file-pdf"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'onclick' => "window.open('" . asset('storage/' . $row->archivo_pdf) . "', '_blank')",
+                'title' => 'Ver PDF'
+            ]);
     }
+
+    // Ver video - SOLO SI HAY VIDEO (archivo o URL)
+    if ($row->video_url || $row->video_archivo) {
+        $actions[] = Button::add('video')
+            ->slot('<i class="fas fa-play"></i>')
+            ->class('bg-purple-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-purple-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'onclick' => $row->video_url
+                    ? "window.open('" . $row->video_url . "', '_blank')"
+                    : "window.open('" . asset('storage/' . $row->video_archivo) . "', '_blank')",
+                'title' => 'Ver video'
+            ]);
+    }
+
+    return $actions;
+}
 }

@@ -7,7 +7,7 @@ use Livewire\Attributes\Title;
 new #[Title('Editar Gaceta')] class extends Component
 {
     public Gaceta $gaceta;
-
+    public $mode = 'edit';
     public $fecha_aprobacion;
     public $observacion;
 
@@ -19,7 +19,10 @@ new #[Title('Editar Gaceta')] class extends Component
     public function mount(Gaceta $gaceta)
     {
         $this->gaceta = $gaceta;
-        $this->fecha_aprobacion = $this->gaceta->fecha_aprobacion?->format('Y-m-d');
+        // Formato correcto para datetime-local: Y-m-d\TH:i
+        $this->fecha_aprobacion = $this->gaceta->fecha_aprobacion
+            ? $this->gaceta->fecha_aprobacion->format('Y-m-d\TH:i')
+            : null;
         $this->observacion = $this->gaceta->observacion;
     }
 
@@ -52,22 +55,13 @@ new #[Title('Editar Gaceta')] class extends Component
 
 <div>
 <div class="mt-6"> <!-- separa del nav superior -->
-    <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-        <!-- Dashboard -->
-        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-            <x-icon name="home" class="w-4 h-4" />
-            Dashboard
-        </a>
-
-        <!-- Separador -->
-        <span class="text-gray-400 dark:text-gray-500">/</span>
-
-        <!-- Sección actual -->
-        <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-            <x-icon name="document-text" class="w-4 h-4" />
-           Editar  Gacetas
-        </span>
-    </nav>
+     <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Listado Gacetas', 'route' => route('admin.gacetas.index')],
+            ['name' => 'Editar Gacetas'],
+        ]" />
+    </x-slot>
 </div>
-      @include('livewire.pages.admin.gacetas.form.edit')
+          @include('livewire.pages.admin.gacetas.form.form', ['mode' => $mode])
 </div>

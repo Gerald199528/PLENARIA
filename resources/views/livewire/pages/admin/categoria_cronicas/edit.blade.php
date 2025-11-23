@@ -140,20 +140,14 @@ public function save()
 };
 ?>
 <div>
-        <!-- Breadcrumbs -->
-        <x-slot name="breadcrumbs">
-            <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-                <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                    <x-icon name="home" class="w-4 h-4" />
-                    Dashboard
-                </a>
-                <span class="text-gray-400 dark:text-gray-500">/</span>
-                <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                    <x-icon name="document-text" class="w-4 h-4" />
-                    Editar Categoria
-                </span>
-            </nav>
-        </x-slot> 
+         <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Categorias Cronicas', 'route' => route('admin.categoria_cronicas.index')],
+            ['name' => 'Editar Categoria Cronica'],
+        ]" />
+    </x-slot>
+
 
         @include('livewire.pages.admin.categoria_cronicas.form.form', ['mode' => 'edit'])
 </div>

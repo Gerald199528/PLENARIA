@@ -9,6 +9,7 @@ new class extends Component
 {
     public $derechoPalabraId = null;
     public $email = '';
+    public $estado = '';
     public $observaciones = '';
 
     protected $listeners = [
@@ -18,6 +19,7 @@ new class extends Component
     public function rules()
     {
         return [
+            'estado' => 'required|in:pendiente,aprobada,rechazada',
             'observaciones' => 'required|string|max:1000',
             'email' => 'required|email',
         ];
@@ -26,6 +28,8 @@ new class extends Component
     public function messages()
     {
         return [
+            'estado.required' => 'El estado es obligatorio.',
+            'estado.in' => 'El estado seleccionado no es válido.',
             'observaciones.required' => 'Las observaciones son obligatorias.',
             'observaciones.max' => 'Las observaciones no pueden exceder 1000 caracteres.',
             'email.required' => 'El email es requerido.',
@@ -36,8 +40,13 @@ new class extends Component
     public function abrirConfirmarModal($id)
     {
         try {
+            // Limpiar datos previos PRIMERO
+            $this->resetForm();
+            
             $this->derechoPalabraId = $id;
             $derecho = DerechoDePalabra::findOrFail($id);
+            
+            Log::info('Modal abierto - ID: ' . $id . ' - Email: ' . $derecho->email);
             
             // Validar si ya está aprobada
             if ($derecho->estado === 'aprobada') {
@@ -49,8 +58,13 @@ new class extends Component
                 return;
             }
             
+            // Asignar email del registro específico
             $this->email = $derecho->email ?? '';
+            $this->estado = '';
             $this->observaciones = '';
+            
+            Log::info('Datos cargados - Email asignado: ' . $this->email);
+            
         } catch (\Exception $e) {
             Log::error('Error al abrir modal: ' . $e->getMessage());
             $this->dispatch('showAlert', [
@@ -81,15 +95,15 @@ new class extends Component
             
             // Actualizar estado ANTES de enviar email
             $derecho->update([
-                'estado' => 'aprobada',
+                'estado' => $this->estado,
                 'observaciones' => trim($this->observaciones),
                 'fecha_respuesta' => now(),
             ]);
 
-            // Enviar email - CORREGIDO
+            // Enviar email
             Mail::send(new ConfirmarDerechoPalabraMail($derecho, $this->observaciones));
 
-            Log::info('Email enviado exitosamente a: ' . $derecho->email);
+            Log::info('Email enviado exitosamente a: ' . $derecho->email . ' para ID: ' . $this->derechoPalabraId);
 
             // Cerrar modal
             $this->dispatch('closeModal', name: 'confirmarModal');
@@ -156,7 +170,7 @@ new class extends Component
 
     public function resetForm()
     {
-        $this->reset(['derechoPalabraId', 'email', 'observaciones']);
+        $this->reset(['derechoPalabraId', 'email', 'estado', 'observaciones']);
         $this->resetValidation();
     }
 }; ?>

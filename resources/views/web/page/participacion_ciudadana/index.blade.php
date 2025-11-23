@@ -60,14 +60,16 @@
                         <div class="flex items-center text-gray-700 gap-2 sm:gap-3">
                             <i class="fas fa-calendar-alt text-primary text-lg sm:text-xl flex-shrink-0"></i>
                             <span class="text-sm sm:text-base font-semibold">
-                                {{ $sesion->fecha_hora->timezone('America/Caracas')->format('d \d\e F \d\e Y') }}
+                     {{ $sesion->fecha_hora->timezone('America/Caracas')->translatedFormat('d \d\e F \d\e Y') }}
+
                             </span>
                         </div>
 
                         <div class="flex items-center text-gray-700 gap-2 sm:gap-3">
                             <i class="fas fa-clock text-primary text-lg sm:text-xl flex-shrink-0"></i>
                             <span class="text-sm sm:text-base font-semibold">
-                                {{ $sesion->fecha_hora->timezone('America/Caracas')->format('H:i A') }}
+                           {{ $sesion->fecha_hora->timezone('America/Caracas')->format('h:i A') }}
+
                             </span>
                         </div>
                     </div>

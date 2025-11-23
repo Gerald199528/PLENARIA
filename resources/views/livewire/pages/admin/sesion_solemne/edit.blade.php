@@ -201,21 +201,13 @@ new class extends Component {
 ?>
 
 <div>
-    <!-- Breadcrumbs -->
     <x-slot name="breadcrumbs">
-        <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-            <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-4 h-4" />
-                Dashboard
-            </a>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="document-text" class="w-4 h-4" />
-                Editar Sesión Solemne
-            </span>
-        </nav>
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Sesiones Solemne', 'route' => route('admin.sesion_solemne.index')],
+            ['name' => 'Editar sesión Solemne'],
+        ]" />
     </x-slot>
-
     @include('livewire.pages.admin.sesion_solemne.form.form', [
         'mode' => $mode,
         'sesionSolemne' => $sesionSolemne

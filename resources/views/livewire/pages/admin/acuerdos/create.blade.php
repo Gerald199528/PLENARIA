@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 new #[Title('Cargar Acuerdo')] class extends Component
 {
     use WithFileUploads;
-
+    public $mode = 'create'; 
     public $nombre; 
     public $fecha_aprobacion; 
     public $categoria_id; 
@@ -206,48 +206,19 @@ new #[Title('Cargar Acuerdo')] class extends Component
  ?>
 <div>
 <div class="mt-6"> <!-- separa del nav superior -->
-    <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-        <!-- Dashboard -->
-        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-            <x-icon name="home" class="w-4 h-4" />
-            Dashboard
-        </a>
-
-        <!-- Separador -->
-        <span class="text-gray-400 dark:text-gray-500">/</span>
-
-        <!-- Sección actual -->
-        <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-            <x-icon name="document-text" class="w-4 h-4" />
-          Importar Acuerdo
-        </span>
-    </nav>
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Importar Acuerdo',
+            ],
+        ]" />
+    </x-slot>
 </div>
 
+        @include('livewire.pages.admin.acuerdos.form.form', ['mode' => $mode])
 
-    @include('livewire.pages.admin.acuerdos.form.importar')
-
-    @push('scripts')
-    
-    <script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.data('fadeIn', () => ({
-      show: false,
-      init() {
-        setTimeout(() => this.show = true, 200)
-      }
-    }))
-  })
-</script>
-        <script>
-            Livewire.on('redirectAfterSave', () => {
-                setTimeout(() => {
-                    window.location.href = "{{ route('admin.acuerdos.index') }}";
-                }, 1000);
-            });
-        </script>
-    @endpush
-
-
-    
 </div>

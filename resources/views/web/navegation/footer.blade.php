@@ -16,12 +16,7 @@
                 <p class="mb-6 leading-relaxed text-justify text-sm">
                     "Con Plenaria, garantizamos el acceso digital simple e inmediato a todos los documentos legales y acuerdos de diferentes Concejos Municipales de Venezuela."
                 </p>
-                <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-facebook text-lg"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-twitter text-lg"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-linkedin text-lg"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-primary transition-colors"><i class="fab fa-instagram text-lg"></i></a>
-                </div>
+           
             </div>
 
             <!-- Enlaces Rápidos -->
@@ -42,7 +37,7 @@
                 <ul class="space-y-3">
                     <li class="flex items-start">
                         <i class="fas fa-map-marker-alt text-primary mr-3 mt-1 text-sm"></i>
-                        <span class="text-sm">Dirección, Ciudad, Venezuela</span>
+                        <span class="text-sm">Caracas, Venezuela</span>
                     </li>
                     <li class="flex items-start">
                         <i class="fas fa-phone text-primary mr-3 mt-1 text-sm"></i>
@@ -50,7 +45,7 @@
                     </li>
                     <li class="flex items-start">
                         <i class="fas fa-envelope text-primary mr-3 mt-1 text-sm"></i>
-                        <a href="mailto:info@plenaria.gob.ve" class="text-sm hover:text-white transition-colors">info@plenaria.gob.ve</a>
+                        <a href="mailto:info@plenaria.gob.ve" class="text-sm hover:text-white transition-colors">Plenaria.nexa.2.0@gmail.com</a>
                     </li>
                 </ul>
             </div>

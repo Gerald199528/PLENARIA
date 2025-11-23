@@ -45,43 +45,28 @@ new class extends Component {
 ?>
 <div class="mt-6"> <!-- margen superior para separar del nav -->
 
-<!-- Breadcrumbs -->
-<x-slot name="breadcrumbs">
-    <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-        <!-- Dashboard -->
-        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-            <x-icon name="home" class="w-4 h-4" />
-            Dashboard
-        </a>
-
-        <!-- Separador -->
-        <span class="text-gray-400 dark:text-gray-500">/</span>
-
-        <!-- Sección actual -->
-        <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-            <x-icon name="document-text" class="w-4 h-4" />
-            Acuerdos
-        </span>
-    </nav>
-</x-slot>
-
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Listado Acuerdos',
+            ],
+        ]" />
+    </x-slot>
 <!-- Botón importar -->
 @can('create-acuerdos')
 <x-slot name="action">
-    <div class="mt-4"> <!-- margen entre breadcrumbs y botón -->
-        <a
-
-
- href='{{ route('admin.acuerdos.create') }}'
+    <div class="mt-3 sm:mt-4">
+        <a href='{{ route('admin.acuerdos.create') }}'
            wire:navigate
-
-
-          
-            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
+           class="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-md sm:rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs sm:text-sm"
         >
-            <i class="fa-solid fa-arrow-up-from-bracket animate-bounce"></i>
-            Importar Acuerdos
-    </a>
+            <i class="fa-solid fa-arrow-up-from-bracket animate-bounce text-sm sm:text-base"></i>
+            <span class="truncate">Importar Acuerdo</span>
+        </a>
     </div>
 </x-slot>
 @endcan

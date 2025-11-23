@@ -42,21 +42,19 @@ new class extends Component {
             ['name' => 'Agenda Municipal'],
         ]" />
     </x-slot>
-
-    @can('create-sesion_municipal')
-        <x-slot name="action">
-            <div class="mt-4">
-                <a
-                   href="{{ route('admin.sesion_municipal.create') }}" 
-                   wire:navigate
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
-                >
-                   <i class="fa-solid fa-calendar-day animate-bounce"></i>
-                   Agendar Sesión 
-                </a>
-            </div>
-        </x-slot>
-    @endcan
+@can('create-sesion_municipal')
+<x-slot name="action">
+    <div class="mt-4">
+        <a href="{{ route('admin.sesion_municipal.create') }}" 
+           wire:navigate
+           class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400">
+            <i class="fa-solid fa-calendar-day animate-bounce"></i>
+          Agendar Sesión
+           
+        </a>
+    </div>
+</x-slot>
+@endcan
 
     <x-container class="w-full px-4 mt-6">
         <livewire:sesion-municipal-table />

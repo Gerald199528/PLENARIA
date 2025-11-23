@@ -47,29 +47,18 @@ new class extends Component
 };?>
 <div class="mt-6"> <!-- margen superior para separar del nav -->
 
-    <!-- Breadcrumbs -->
     <x-slot name="breadcrumbs">
-        <nav class="flex flex-wrap items-center text-xs sm:text-sm font-medium 
-                    text-gray-600 dark:text-gray-300 gap-1 sm:gap-2" 
-             aria-label="Breadcrumb">
-
-            <!-- Dashboard -->
-            <a href="{{ route('admin.dashboard') }}" 
-               class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-3 h-3 sm:w-4 sm:h-4" />
-                Dashboard
-            </a>
-
-            <!-- Separador -->
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-
-            <!-- Sección actual -->
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="document-text" class="w-3 h-3 sm:w-4 sm:h-4" />
-                Ordenanzas
-            </span>
-        </nav>
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Listado Ordenanzas',
+            ],
+        ]" />
     </x-slot>
+
 
     <!-- Botón acción -->
     @can('create-ordenanza')    

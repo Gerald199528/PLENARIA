@@ -142,25 +142,28 @@ Column::make('Categoría', 'categoria_nombre')
     
             // Botón Editar
             Button::add('edit')
-                ->slot('<i class="fas fa-edit"></i>')
-                ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
-                ->route('admin.cronicas.edit', ['cronica' => $row->id])
+            ->slot('<i class="fas fa-edit"></i>')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->route('admin.cronicas.edit', ['cronica' => $row->id])
                 ->attributes(['wire:navigate' => true]),
+    
 
                         // Botón Ver PDF (ahora aquí en acciones)
-            Button::add('view')
-                ->slot('<i class="fas fa-eye"></i>')
-                ->class('bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => "window.open('" . asset('storage/' . $row->archivo_pdf) . "', '_blank')",
-                ]),
-
+       Button::add('view')
+    ->slot('<i class="fas fa-eye"></i>')
+    ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+    ->attributes([
+        'onclick' => "window.open('" . asset('storage/' . $row->archivo_pdf) . "', '_blank')",
+        'title' => 'Ver documento'
+    ]),
 
             // Botón Eliminar
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-                ->attributes(['onclick' => "confirmDelete({$row->id})"]),
+              Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+          ->attributes(['onclick' => "confirmDelete({$row->id})"]),
         ];
     }
 }
+
+  

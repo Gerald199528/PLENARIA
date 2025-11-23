@@ -76,22 +76,21 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
         return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
     }
 }; ?>
-<div class="flex flex-col gap-12">
-    <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">
-            <!-- Logo -->
-            <a href="{{ route('home') }}" class="flex items-center mb-6 gap-3 group">
-            <!-- Ícono animado Plenaria -->
-                <div class="w-10 h-10 flex items-center justify-center from-white to-gray-200 rounded font-bold text-white text-sm shadow-lg animate-bounce" style="animation-duration: 2s;">
-                    <i class="fas fa-landmark text-5xl"></i>
-                </div> 
-            <!-- Texto Plenaria -->
-            <span class="text-6xl font-bold tracking-wider text-white group-hover:text-gray-100 transition-all duration-300">
-                PLENARIA
-            </span>
-        </a>
-
-            <!-- Formulario -->
+                <div class="flex flex-col gap-12">
+                    <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
+                        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">
+                    <!-- Logo -->
+                <a href="{{ route('home') }}" class="flex items-center mb-6 gap-3 group">
+                    <!-- Ícono animado Plenaria -->
+                    <div class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center from-white to-gray-200 rounded font-bold text-white text-sm shadow-lg animate-bounce" style="animation-duration: 2s;">
+                        <i class="fas fa-landmark text-2xl md:text-5xl"></i>
+                    </div> 
+                    <!-- Texto Plenaria -->
+                    <span class="text-2xl md:text-4xl lg:text-6xl font-bold tracking-wider text-white group-hover:text-gray-100 transition-all duration-300">
+                        PLENARIA
+                    </span>
+                </a>
+                            <!-- Formulario -->
             <div class="w-full bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl backdrop-blur-md md:mt-0 sm:max-w-md xl:p-0 transform transition-transform duration-700 ease-out animate-fadeIn scale-95 hover:scale-100">
                 <div class="p-6 space-y-6 md:space-y-8 sm:p-8">
                     <h1 class="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">

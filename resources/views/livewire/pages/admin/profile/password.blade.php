@@ -53,33 +53,33 @@ new class extends Component {
                 <p class="text-sm text-gray-500">Asegúrate de que tu cuenta utilice una contraseña larga y aleatoria para mantenerla segura.</p>
                 <hr class="my-4 border-gray-200">
             </div>
-    <form wire:submit.prevent="updatePassword" class="my-6 w-full space-y-6">
+   <form wire:submit.prevent="updatePassword" class="my-4 sm:my-6 w-full space-y-4 sm:space-y-6">
                 
                 <!-- Contraseña Actual -->
                 <div class="relative group">
-                    <label for="current_password" class="flex items-center gap-2 mb-1 text-base font-semibold text-gray-700 dark:text-gray-300">
-                        <x-icon name="lock-closed" /> Contraseña Actual
+                    <label for="current_password" class="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                        <x-icon name="lock-closed" class="w-4 h-4 sm:w-5 sm:h-5" /> <span>Contraseña Actual</span>
                     </label>
                     <input type="password" id="current_password" wire:model="current_password" placeholder="Ingresa tu contraseña actual" required autofocus autocomplete="current-password"
-                        class="block w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
+                        class="block w-full p-2.5 sm:p-3 md:p-4 text-sm sm:text-base bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
                 </div>
 
                 <!-- Nueva Contraseña -->
                 <div class="relative group">
-                    <label for="password" class="flex items-center gap-2 mb-1 text-base font-semibold text-gray-700 dark:text-gray-300">
-                        <x-icon name="lock-closed" /> Nueva Contraseña
+                    <label for="password" class="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                        <x-icon name="lock-closed" class="w-4 h-4 sm:w-5 sm:h-5" /> <span>Nueva Contraseña</span>
                     </label>
                     <input type="password" id="password" wire:model="password" placeholder="Ingresa tu nueva contraseña" required autocomplete="new-password"
-                        class="block w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
+                        class="block w-full p-2.5 sm:p-3 md:p-4 text-sm sm:text-base bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
                 </div>
 
                 <!-- Confirmar Contraseña -->
                 <div class="relative group">
-                    <label for="password_confirmation" class="flex items-center gap-2 mb-1 text-base font-semibold text-gray-700 dark:text-gray-300">
-                        <x-icon name="lock-closed" /> Confirmar Contraseña
+                    <label for="password_confirmation" class="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                        <x-icon name="lock-closed" class="w-4 h-4 sm:w-5 sm:h-5" /> <span>Confirmar Contraseña</span>
                     </label>
                     <input type="password" id="password_confirmation" wire:model="password_confirmation" placeholder="Confirma tu nueva contraseña" required autocomplete="new-password"
-                        class="block w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
+                        class="block w-full p-2.5 sm:p-3 md:p-4 text-sm sm:text-base bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-lg">
                 </div>
 
                 <!-- Validación de errores -->
@@ -89,7 +89,7 @@ new class extends Component {
                 <x-slot name="footer">
                     <div class="flex justify-center">
                         <x-button info icon="check" label="Guardar" wire:click="updatePassword" spinner="updatePassword"
-                            class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400" />
+                            class="inline-flex items-center justify-center gap-2 px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-3.5 text-sm md:text-base bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl sm:rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 w-full sm:w-auto" />
                     </div>
                 </x-slot>
             </form>

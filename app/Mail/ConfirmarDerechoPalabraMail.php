@@ -29,8 +29,12 @@ class ConfirmarDerechoPalabraMail extends Mailable
      */
     public function envelope(): Envelope
     {
+        $asunto = $this->derecho->estado === 'aprobada' 
+            ? 'Tu solicitud de Derecho de Palabra ha sido Aprobada'
+            : 'Tu solicitud de Derecho de Palabra ha sido Rechazada';
+
         return new Envelope(
-            subject: 'Tu solicitud de Derecho de Palabra ha sido confirmada',
+            subject: $asunto,
             to: [$this->derecho->email],
         );
     }
@@ -46,6 +50,7 @@ class ConfirmarDerechoPalabraMail extends Mailable
                 'nombre' => $this->derecho->nombre . ' ' . $this->derecho->apellido,
                 'email' => $this->derecho->email,
                 'cedula' => $this->derecho->cedula,
+                'estado' => $this->derecho->estado,
                 'observaciones' => $this->observaciones,
                 'fecha' => now()->format('d/m/Y H:i'),
             ],

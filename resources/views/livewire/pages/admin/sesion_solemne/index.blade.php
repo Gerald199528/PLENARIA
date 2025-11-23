@@ -48,35 +48,29 @@ new class extends Component {
 ?>
 
 <div>
-     <!-- Breadcrumbs -->
-    <x-slot name="breadcrumbs">
-        <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-            <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-4 h-4" />
-                Dashboard
-            </a>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="document-text" class="w-4 h-4" />
-                Listado Sesiones Extraordinarias
-            </span>
-        </nav>
-    </x-slot>
+             <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Sesiones Solemne',
+            ],
+        ]" />
+    </x-slot>    
 
     <!-- Botón Nueva Sesión -->
     @can('create-sesion_solemne')
-        <x-slot name="action">
-            <div class="mt-4">
-                <a
-                    href="{{ route('admin.sesion_solemne.create') }}" 
-                    wire:navigate
-                    class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
-                >
-                    <i class="fa-solid fa-arrow-right-to-file animate-bounce"></i>
-                    Importar Sesión
-                </a>
-            </div>
-        </x-slot>
+      <x-slot name="action">
+        <div class="mt-4">
+            <a    href="{{ route('admin.sesion_solemne.create') }}"  wire:navigate class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400">
+                <i class="fa-solid fa-arrow-right-to-file animate-bounce"></i>
+                <span class="hidden sm:inline">Importar Sesión</span>
+                <span class="sm:hidden">Importar</span>
+            </a>
+        </div>
+    </x-slot>
     @endcan
 
     <!-- Tabla de Sesiones Extraordinarias -->

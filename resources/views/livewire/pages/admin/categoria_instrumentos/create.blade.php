@@ -10,7 +10,7 @@ new class extends Component {
     public $nombre = '';
     public $tipo_categoria = '';
     public $observacion = '';
-
+    public $mode = 'create'; 
     protected $rules = [
         'nombre' => 'required|string|max:255',
         'tipo_categoria' => 'required|string|max:255',
@@ -107,42 +107,19 @@ new class extends Component {
 
     <!-- Breadcrumbs -->
     <div class="mt-6">
-        <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-            <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-4 h-4" />
-                Dashboard
-            </a>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="document-text" class="w-4 h-4" />
-                Nueva Categoría
-            </span>
-        </nav>
+        <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Nueva Categoria',
+            ],
+        ]" />
+    </x-slot>
     </div>
-
-    <!-- Formulario -->
-    @include('livewire.pages.admin.categoria_instrumentos.form.nueva_categoria')
-
-    @push('scripts')
-    <script>
-        Livewire.on('showAlert', params => {
-            Swal.fire({
-                icon: params.icon,
-                title: params.title,
-                text: params.text,
-                timer: params.timer || 2000,
-                timerProgressBar: params.timerProgressBar || false,
-                showConfirmButton: false,
-            });
-        });
-
-        Livewire.on('redirectAfterSave', () => {
-            setTimeout(() => {
-                window.location.href = "{{ route('admin.categoria-instrumentos.index') }}";
-            }, 1500);
-        });
-    </script>
-    @endpush
+        @include('livewire.pages.admin.categoria_instrumentos.form.form', ['mode' => $mode])
 
 </div>
 

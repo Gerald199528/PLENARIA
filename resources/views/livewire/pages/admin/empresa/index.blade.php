@@ -51,14 +51,14 @@ new class extends Component {
     </x-slot>
 @can('create-empresa')
 <x-slot name="action">
-    <div class="mt-4">
+    <div class="mt-2 sm:mt-3 md:mt-4">
         <a
            href="{{ route('admin.empresa.create') }}" 
            wire:navigate
-           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
+           class="inline-flex items-center justify-center gap-2 px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-sm md:text-base w-full sm:w-auto"
         >
             <i class="fa-solid fa-building animate-bounce"></i>
-            Nueva Empresa
+            <span>Nueva Empresa</span>
         </a>
     </div>
 </x-slot>

@@ -169,5 +169,17 @@ protected function rules()
     };
     ?>
     <div>
+
+            <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => ' Registrar Cronicas',
+            ],
+        ]" />
+    </x-slot>
         @include('livewire.pages.admin.cronicas.form.form', ['mode' => $mode])
     </div>

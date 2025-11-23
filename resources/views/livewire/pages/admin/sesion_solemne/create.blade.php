@@ -145,7 +145,17 @@ new class extends Component {
 
 };
 ?>
-
-<div>
+<div>   
+            <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Registrar Sesion Solemne',
+            ],
+        ]" />
+    </x-slot>  
     @include('livewire.pages.admin.sesion_solemne.form.form', ['mode' => $mode])
 </div>

@@ -433,12 +433,12 @@
             </div>
 
             <div class="p-4 border-t border-white/20">
-            <a href="{{ ('/') }}" class="flex ms-4 md:me-15 items-center" target="_blank">
-                <img src="{{ asset(path: 'logo_nexa_18.png') }}" 
-                    class="h-8 w-105 me-3 drop-shadow-lg transform transition-all duration-500 hover:scale-x-105 hover:rotate-1 animate-bounce-slow" 
-                    alt="Nevora Logo" />
-                <span class="self-center text-xl font-bold sm:text-2xl whitespace-nowrap text-white drop-shadow-md"></span>
-            </a>
+            <a href="{{ ('/') }}" class="flex justify-center items-center" target="_blank">
+        <img src="{{ asset(path: 'logo_nexa_18.png') }}" 
+            class="h-6 sm:h-7 md:h-8 w-auto drop-shadow-lg transform transition-all duration-500 hover:scale-x-105 hover:rotate-1 animate-bounce-slow" 
+            alt="Nevora Logo" />
+        <span class="self-center text-sm sm:text-base md:text-xl font-bold whitespace-nowrap text-white drop-shadow-md"></span>
+    </a>
                         <br>
             <button
                 onclick="window.location.href='{{ route(""
@@ -449,27 +449,4 @@
             </button>
         </div>
         </aside>
-        @push('styles')
-        <style>
-            @keyframes gradientBackground {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-            .animate-gradientBackground {
-                background-size: 200% 200%;
-                animation: gradientBackground 15s ease infinite;
-            }
-            .dark #logo-sidebar {
-                background: linear-gradient(to bottom, #1f2937, #111827, #1f2937);
-                animation: none;
-            }
-            @keyframes fadeIn {
-                0% { opacity: 0; transform: translateY(20px); }
-                100% { opacity: 1; transform: translateY(0); }
-            }
-            .animate-fadeIn {
-                animation: fadeIn 1s ease forwards;
-            }
-        </style>
-        @endpush
+      

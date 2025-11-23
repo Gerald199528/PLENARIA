@@ -105,21 +105,22 @@ final class SesionOrdinariaTable extends PowerGridComponent
         ];
     }
 
-    public function actions(\App\Models\SesionOrdinaria $row): array
-    {
-        return [
-            Button::add('edit')
-                ->slot('<i class="fas fa-edit"></i>')
-                ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
-                ->route('admin.sesion_ordinaria.edit', ['sesion_ordinaria' => $row->id])
-                ->attributes(['wire:navigate' => true]),
-        
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-                ->attributes([
-                    'onclick' => "confirmDelete({$row->id})"
-                ]),
-        ];
-    }
+public function actions(\App\Models\SesionOrdinaria $row): array
+{
+    return [
+        Button::add('edit')
+            ->slot('<i class="fas fa-edit"></i>')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->route('admin.sesion_ordinaria.edit', ['sesion_ordinaria' => $row->id])
+            ->attributes(['wire:navigate' => true, 'title' => 'Editar sesión']),
+    
+        Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'onclick' => "confirmDelete({$row->id})",
+                'title' => 'Eliminar sesión'
+            ]),
+    ];
+}
 }

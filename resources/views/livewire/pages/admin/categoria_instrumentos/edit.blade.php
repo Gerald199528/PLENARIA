@@ -6,7 +6,7 @@ use Livewire\Attributes\Title;
 
 new #[Title('Editar Categoría')] class extends Component {
     public CategoriaInstrumento $categoriaInstrumento;
-
+    public $mode = 'edit';
     public ?string $nombre = '';
     public ?string $tipo_categoria = '';
     public ?string $observacion = '';
@@ -19,23 +19,13 @@ new #[Title('Editar Categoría')] class extends Component {
 
     public function mount(CategoriaInstrumento $categoria_instrumento): void
     {
-        // Usamos el mismo nombre que en la ruta {categoria_instrumento}
         $this->categoriaInstrumento = $categoria_instrumento;
-
         $this->nombre         = $categoria_instrumento->nombre;
         $this->tipo_categoria = $categoria_instrumento->tipo_categoria;
         $this->observacion    = $categoria_instrumento->observacion;
-
-        // Debug opcional
-        \Log::info('Editando categoría', [
-            'id' => $categoria_instrumento->id,
-            'nombre' => $this->nombre,
-            'tipo_categoria' => $this->tipo_categoria,
-            'observacion' => $this->observacion,
-        ]);
     }
 
-    public function update(): void
+    public function save()
     {
         $this->validate();
 
@@ -54,8 +44,7 @@ new #[Title('Editar Categoría')] class extends Component {
                 'timerProgressBar' => true,
             ]);
 
-            // Redireccionar después de un breve delay
-            $this->dispatch('redirectAfterSave');
+            return $this->redirect(route('admin.categoria-instrumentos.index'), navigate: true);
 
         } catch (\Exception $e) {
             $this->dispatch('showAlert', [
@@ -78,36 +67,13 @@ new #[Title('Editar Categoría')] class extends Component {
 <div>
     <!-- Breadcrumb -->
     <div class="mt-6">
-        <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-            <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-4 h-4" />
-                Dashboard
-            </a>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="tag" class="w-4 h-4" />
-                Editar Categoría
-            </span>
-        </nav>
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Listado Categorias', 'route' => route('admin.categoria-instrumentos.index')],
+            ['name' => 'Editar Categoria'],
+        ]" />
+    </x-slot>
     </div>
-@include('livewire.pages.admin.categoria_instrumentos.form.edit_categoria')
-
-    @push('scripts')
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('fadeIn', () => ({
-            show: false,
-            init() {
-                setTimeout(() => this.show = true, 200)
-            }
-        }))
-    })
-
-    Livewire.on('redirectAfterSave', () => {
-        setTimeout(() => {
-            window.location.href = "{{ route('admin.categoria-instrumentos.index') }}";
-        }, 1000);
-    });
-</script>
-@endpush
+      @include('livewire.pages.admin.categoria_instrumentos.form.form', ['mode' => $mode])
 </div>

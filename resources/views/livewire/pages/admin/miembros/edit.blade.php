@@ -153,6 +153,13 @@ public function save()
     };
     ?>
     <div>
+           <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
+            ['name' => 'Miembros', 'route' => route('admin.miembros.index')],
+            ['name' => 'Editar miembro'],
+        ]" />
+    </x-slot>
             @include('livewire.pages.admin.miembros.from.from', [ 'showForm' => true, 'editForm' => true, 'mode' => 'edit' ])
     </div>
 

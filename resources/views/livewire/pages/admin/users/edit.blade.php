@@ -125,7 +125,7 @@ new class extends Component {
         <livewire:components.breadcrumb :breadcrumbs="[
             ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
             ['name' => 'Usuarios', 'route' => route('admin.users.index')],
-            ['name' => 'Crear Usuario'],
+            ['name' => 'Editar usuario'],
         ]" />
     </x-slot>
 

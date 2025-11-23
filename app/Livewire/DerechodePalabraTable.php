@@ -167,19 +167,21 @@ final class DerechodePalabraTable extends PowerGridComponent
     public function actions(DerechoDePalabra $row): array
     {
         return [
-            Button::add('confirmar')
-                ->slot('<i class="fas fa-handshake"></i>')
-                ->class('bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 shadow-sm mr-2')
-                ->attributes([
-                    'wire:click' => '$dispatch(\'abrir-confirmar-modal\', { id: ' . $row->id . ' })',
-                ]),
+       Button::add('confirmar')
+    ->slot('<i class="fas fa-handshake"></i>')
+    ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+    ->attributes([
+        'wire:click' => '$dispatch(\'abrir-confirmar-modal\', { id: ' . $row->id . ' })',
+        'title' => 'Confirmar solicitud'
+    ]),
 
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-                ->attributes([
-                    'onclick' => "confirmDeleteDerechoPalabra({$row->id})"
-                ]),
+Button::add('delete')
+    ->slot('<i class="fas fa-trash"></i>')
+    ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+    ->attributes([
+        'onclick' => "confirmDeleteDerechoPalabra({$row->id})",
+        'title' => 'Eliminar solicitud'
+    ]),
         ];
     }
 }

@@ -42,31 +42,27 @@ new class extends Component {
 }; ?>
 
 <div>
-<!-- Breadcrumbs -->
-<x-slot name="breadcrumbs">
-    <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-        <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-            <x-icon name="home" class="w-4 h-4" />
-            Dashboard
-        </a>
-        <span class="text-gray-400 dark:text-gray-500">/</span>
-        <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-            <x-icon name="document-text" class="w-4 h-4" />
-         Listado de Concejales
-        </span>
-    </nav>
-</x-slot>
-
-<!-- Botón Nuevo Perfil -->
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => ' Concejales',
+            ],
+        ]" />
+    </x-slot>
+<!-- Botón Nuevo Perfil Responsivo -->
 @can('create-concejal')
 <x-slot name="action">
-    <div class="mt-4">
+    <div class="mt-2 sm:mt-3 md:mt-4">
         <a
            href="{{ route('admin.concejales.create') }}" 
            wire:navigate
-           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400"
+           class="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-lg sm:rounded-xl shadow-md sm:shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs sm:text-sm md:text-base"
         >
-            <i class="fa-solid fa-user-plus  animate-bounce"></i>
+            <i class="fa-solid fa-user-plus animate-bounce text-xs sm:text-sm md:text-base flex-shrink-0"></i>
             Nuevo Perfil
         </a>
     </div>

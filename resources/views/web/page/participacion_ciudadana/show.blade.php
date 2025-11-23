@@ -178,11 +178,11 @@
             </div>
         @endif
 
-        <!-- Botón Volver -->
-        <div class="mt-12 text-center animate-fade-in-up" style="animation-delay: 1s;">
-            <a href="{{ route('home') }}#participacion" class="inline-flex items-center bg-primary hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-110 hover:shadow-lg">
-                <i class="fas fa-arrow-left mr-2"></i>
-                Volver a Participación Ciudadana
+    <!-- Botón Volver -->
+        <div class="mt-8 sm:mt-10 md:mt-12 text-center animate-fade-in-up" style="animation-delay: 1s;">
+            <a href="{{ route('home') }}#participacion" class="inline-flex items-center justify-center gap-1.5 sm:gap-2 bg-primary hover:bg-blue-700 text-white px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-lg md:rounded-lg font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 transform hover:scale-105 sm:hover:scale-110 hover:shadow-lg w-full sm:w-auto">
+                <i class="fas fa-arrow-left"></i>
+                <span>Volver a Participación Ciudadana</span>
             </a>
         </div>
     </div>

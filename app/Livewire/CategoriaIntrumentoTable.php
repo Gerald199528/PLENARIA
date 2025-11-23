@@ -97,22 +97,24 @@ final class CategoriaIntrumentoTable extends PowerGridComponent
         ];
     }
 
-    public function actions(CategoriaInstrumento $row): array
-    {
-        return [
-            // Editar
-            Button::add('edit')
+   public function actions(CategoriaInstrumento $row): array
+{
+    return [
+        // Editar
+        Button::add('edit')
             ->slot('<i class="fas fa-edit"></i>')
-            ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-200 transform hover:scale-105')
             ->route('admin.categoria-instrumentos.edit', ['categoria_instrumento' => $row->id])
-            ->attributes(['wire:navigate' => true]),
-        
+            ->attributes(['wire:navigate' => true, 'title' => 'Editar']),
 
-            // Eliminar
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-                ->attributes(['onclick' => "confirmDelete({$row->id})"]),
-        ];
-    }
+        // Eliminar
+        Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-200 transform hover:scale-105')
+            ->attributes([
+                'onclick' => "confirmDelete({$row->id})",
+                'title' => 'Eliminar'
+            ]),
+    ];
+}
 }

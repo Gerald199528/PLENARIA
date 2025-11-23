@@ -138,36 +138,35 @@ public function actions(User $row): array
     if (Auth::check() && Auth::user()->can('view-user')) {
         $actions[] = Button::add('show')
             ->slot('<i class="fas fa-eye"></i>')
-            ->class('bg-amber-500 text-black px-3 py-1 rounded-md hover:bg-amber-600 shadow-sm mr-2')
+            ->class('bg-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-amber-600 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
             ->route('admin.users.show', ['user' => $row->id])
-            ->attributes(['wire:navigate' => true]);
+            ->attributes(['wire:navigate' => true, 'title' => 'Ver usuario']);
     }
 
     if (Auth::check() && Auth::user()->can('edit-user')) {
         $actions[] = Button::add('edit')
             ->slot('<i class="fas fa-edit"></i>')
-            ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
             ->route('admin.users.edit', ['user' => $row->id])
-            ->attributes(['wire:navigate' => true]);
+            ->attributes(['wire:navigate' => true, 'title' => 'Editar usuario']);
     }
 
-if (Auth::check() && Auth::user()->can('print-user')) {
-    $actions[] = Button::add('pdf')
-        ->slot('<i class="fas fa-file-pdf"></i>')
-        ->class('bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 shadow-sm mr-2');
-}
-
+    if (Auth::check() && Auth::user()->can('print-user')) {
+        $actions[] = Button::add('pdf')
+            ->slot('<i class="fas fa-file-pdf"></i>')
+            ->class('bg-blue-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-blue-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes(['title' => 'Descargar PDF']);
+    }
 
     if (Auth::check() && Auth::user()->can('delete-user')) {
         $actions[] = Button::add('delete')
             ->slot('<i class="fas fa-trash"></i>')
-            ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-            ->attributes(['onclick' => 'confirmDelete(' . $row->id . ')']);
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes(['onclick' => 'confirmDelete(' . $row->id . ')', 'title' => 'Eliminar usuario']);
     }
 
     return $actions;
 }
-
     
 
     

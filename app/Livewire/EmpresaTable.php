@@ -118,48 +118,51 @@ public function filters(): array
     ];
 }
 
+public function actions($row): array
+{
+    return [
+        // Editar
+        Button::add('edit')
+            ->slot('<i class="fas fa-edit"></i>')
+            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-200')
+            ->route('admin.empresa.edit', ['empresa' => $row->id])
+            ->attributes(['wire:navigate' => true, 'title' => 'Editar']),
 
+        // Ver organigrama
+        Button::add('ver')
+            ->slot('<i class="fas fa-eye"></i>')
+            ->class('bg-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-amber-600 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-200')
+            ->attributes([
+                'title' => 'Ver organigrama',
+                'onclick' => $row->organigrama_ruta
+                    ? "window.open('" . asset('storage/' . $row->organigrama_ruta) . "', '_blank')"
+                    : "alert('No hay organigrama disponible')"
+            ]),
 
-    public function actions($row): array
-    {
-        return [
-            // Editar
-            Button::add('edit')
-                ->slot('<i class="fas fa-edit"></i>')
-                ->class('bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 shadow-sm mr-2')
-                ->route('admin.empresa.edit', ['empresa' => $row->id])
-                ->attributes(['wire:navigate' => true]),
+        // Descargar organigrama
+        Button::add('download')
+            ->slot('<i class="fas fa-download"></i>')
+            ->class('bg-emerald-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-emerald-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-200')
+            ->attributes([
+                'title' => 'Descargar organigrama',
+                'onclick' => $row->organigrama_ruta
+                    ? "const link = document.createElement('a');
+                       link.href = '" . asset('storage/' . $row->organigrama_ruta) . "';
+                       link.download = '" . basename($row->organigrama_ruta) . "';
+                       document.body.appendChild(link);
+                       link.click();
+                       document.body.removeChild(link);"
+                    : "alert('No hay organigrama disponible')"
+            ]),
 
-            // Ver organigrama
-            Button::add('ver')
-                ->slot('<i class="fas fa-eye"></i>')
-                ->class('bg-amber-500 text-black px-3 py-1 rounded-md hover:bg-amber-600 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => $row->organigrama_ruta
-                        ? "window.open('" . asset('storage/' . $row->organigrama_ruta) . "', '_blank')"
-                        : "alert('No hay organigrama disponible')"
-                ]),
-
-            // Descargar organigrama
-            Button::add('download')
-                ->slot('<i class="fas fa-download"></i>')
-                ->class('bg-emerald-600 text-white px-3 py-1 rounded-md hover:bg-emerald-700 shadow-sm mr-2')
-                ->attributes([
-                    'onclick' => $row->organigrama_ruta
-                        ? "const link = document.createElement('a');
-                           link.href = '" . asset('storage/' . $row->organigrama_ruta) . "';
-                           link.download = '" . basename($row->organigrama_ruta) . "';
-                           document.body.appendChild(link);
-                           link.click();
-                           document.body.removeChild(link);"
-                        : "alert('No hay organigrama disponible')"
-                ]),
-
-            // Eliminar
-            Button::add('delete')
-                ->slot('<i class="fas fa-trash"></i>')
-                ->class('bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 shadow-sm')
-                ->attributes(['onclick' => "confirmDeleteEmpresa({$row->id})"]),
-        ];
-    }
+        // Eliminar
+        Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-200')
+            ->attributes([
+                'title' => 'Eliminar',
+                'onclick' => "confirmDeleteEmpresa({$row->id})"
+            ]),
+    ];
+}
 }

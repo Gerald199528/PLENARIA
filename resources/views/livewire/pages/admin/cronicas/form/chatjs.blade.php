@@ -1,54 +1,51 @@
-
-     <!-- Gráfica -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700 mb-8" 
-         id="chartWrapper"
-         data-chart-ready="{{ $this->chartReady ? 'true' : 'false' }}" 
-         data-chart-sum="{{ array_sum($this->chartValues) }}"
-         data-chart-labels="{{ json_encode($this->chartLabels) }}"
-         data-chart-values="{{ json_encode($this->chartValues) }}">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
-            <i class="fa-solid fa-chart-column text-blue-500 text-2xl"></i> Crónicas del Cronista
-        </h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Visualización de publicaciones por período</p>
-        <div class="relative h-96 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <canvas id="cronicasBarChart" style="display: block; width: 100% !important; height: 1000% !important;"></canvas>
-            <div id="emptyState" class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 rounded-lg bg-gradient-to-br
-                from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
-                <div class="text-center">
-                    <i class="fa-solid fa-chart-line text-5xl mb-3 opacity-50"></i>
-                    <p>{{ $this->chartReady ? 'No hay datos disponibles para este período' : 'Selecciona una fecha y haz click en Generar' }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Información del Filtro -->
-    <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-md">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-info-circle text-blue-500"></i> Información del Filtro
-        </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Cronista ID</p>
-                <p class="text-lg font-bold text-gray-900 dark:text-white mt-2">{{ $this->cronista?->id ?? 'N/A' }}</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Fecha</p>
-                <p class="text-lg font-bold text-gray-900 dark:text-white mt-2">{{ $this->filterDate ?: 'No seleccionada' }}</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Filtro</p>
-                <p class="text-lg font-bold text-blue-600 dark:text-blue-400 mt-2 capitalize">{{ $this->filterType }}</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Total Registros</p>
-                <p class="text-lg font-bold text-green-600 dark:text-green-400 mt-2">{{ array_sum($this->chartValues) }}</p>
+<!-- Gráfica -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-8 border border-gray-200 dark:border-gray-700 mb-6 sm:mb-8" 
+     id="chartWrapper"
+     data-chart-ready="{{ $this->chartReady ? 'true' : 'false' }}" 
+     data-chart-sum="{{ array_sum($this->chartValues) }}"
+     data-chart-labels="{{ json_encode($this->chartLabels) }}"
+     data-chart-values="{{ json_encode($this->chartValues) }}">
+    <h2 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-chart-column text-blue-500 text-xl sm:text-2xl"></i> Crónicas del Cronista
+    </h2>
+    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4">Visualización de publicaciones por período</p>
+    <div class="relative h-64 sm:h-80 md:h-96 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-700">
+        <canvas id="cronicasBarChart" style="display: block; width: 100% !important; height: 100% !important;"></canvas>
+        <div id="emptyState" class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 p-4">
+            <div class="text-center">
+                <i class="fa-solid fa-chart-line text-4xl sm:text-5xl mb-2 sm:mb-3 opacity-50"></i>
+                <p class="text-xs sm:text-sm">{{ $this->chartReady ? 'No hay datos disponibles para este período' : 'Selecciona una fecha y haz click en Generar' }}</p>
             </div>
         </div>
     </div>
 </div>
- 
- @push('scripts')
+
+<!-- Información del Filtro -->
+<div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 sm:p-6 md:p-8 border border-gray-200 dark:border-gray-700 shadow-md">
+    <h3 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-info-circle text-blue-500"></i> Información del Filtro
+    </h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+        <div class="bg-white dark:bg-gray-800 p-3 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Cronista ID</p>
+            <p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-1 sm:mt-2">{{ $this->cronista?->id ?? 'N/A' }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-3 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Fecha</p>
+            <p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-1 sm:mt-2 truncate">{{ $this->filterDate ?: 'No seleccionada' }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-3 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Filtro</p>
+            <p class="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400 mt-1 sm:mt-2 capitalize">{{ $this->filterType }}</p>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-3 sm:p-5 rounded-lg border border-gray-200 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Total Registros</p>
+            <p class="text-base sm:text-lg font-bold text-green-600 dark:text-green-400 mt-1 sm:mt-2">{{ array_sum($this->chartValues) }}</p>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -258,8 +255,7 @@
     });
     </script>
 
-
-<script>
+    <script>
     document.addEventListener('livewire:init', () => {
         Livewire.on('showAlert', data => {
             Swal.fire({
@@ -271,6 +267,6 @@
             });
         });
     });
-</script>
+    </script>
 
-    @endpush
+@endpush

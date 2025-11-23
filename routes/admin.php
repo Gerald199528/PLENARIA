@@ -1,84 +1,82 @@
-    <?php
+<?php
 
-    use Illuminate\Support\Facades\Route;
-    use Livewire\Volt\Volt;
+use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
-    use App\Http\Controllers\ProductController;
-    use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ImageController;
 
 
 
-    Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-        //Ruta de Dashboard
-        Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
+ //Ruta de Dashboard
+Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
 
         Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
 
-        // Rutas para la gestión de usuarios
-        Volt::route('/users', 'pages.admin.users.index')
-            ->middleware('permission:view-user')
-            ->name('users.index');
+                // Rutas para la gestión de usuarios
+    Volt::route('/users', 'pages.admin.users.index')
+    ->middleware('permission:view-user')
+    ->name('users.index');
 
-        Volt::route('/users/create', 'pages.admin.users.create')
-            ->middleware('permission:create-user')
-            ->name('users.create');
+    Volt::route('/users/create', 'pages.admin.users.create')
+    ->middleware('permission:create-user')
+    ->name('users.create');
 
-        Volt::route('/users/{user}/edit', 'pages.admin.users.edit')
-            ->middleware('permission:edit-user')
-            ->name('users.edit');
+    Volt::route('/users/{user}/edit', 'pages.admin.users.edit')
+    ->middleware('permission:edit-user')
+    ->name('users.edit');
 
-        Volt::route('/users/{user}/show', 'pages.admin.users.show')
-            ->middleware('permission:view-user')
-            ->name('users.show');
+    Volt::route('/users/{user}/show', 'pages.admin.users.show')
+    ->middleware('permission:view-user')
+    ->name('users.show');
 
-        Volt::route('/users/{user}', 'pages.admin.users.destroy')
-            ->middleware('permission:delete-user')
-            ->name('users.destroy');
+    Volt::route('/users/{user}', 'pages.admin.users.destroy')
+    ->middleware('permission:delete-user')
+    ->name('users.destroy');
 
         // Rutas para la gestión de roles
-        Volt::route('/roles', 'pages.admin.roles.index')
-            ->middleware('permission:view-role')
-            ->name('roles.index');
+    Volt::route('/roles', 'pages.admin.roles.index')
+    ->middleware('permission:view-role')
+    ->name('roles.index');
 
-        Volt::route('/roles/create', 'pages.admin.roles.create')
-            ->middleware('permission:create-role')
-            ->name('roles.create');
+    Volt::route('/roles/create', 'pages.admin.roles.create')
+    ->middleware('permission:create-role')
+    ->name('roles.create');
 
-        Volt::route('/roles/{role}/edit', 'pages.admin.roles.edit')
-            ->middleware('permission:edit-role')
-            ->name('roles.edit');
+    Volt::route('/roles/{role}/edit', 'pages.admin.roles.edit')
+    ->middleware('permission:edit-role')
+    ->name('roles.edit');
 
-        Volt::route('/roles/{role}/show', 'pages.admin.roles.show')
-            ->middleware('permission:view-role')
-            ->name('roles.show');
+    Volt::route('/roles/{role}/show', 'pages.admin.roles.show')
+    ->middleware('permission:view-role')
+    ->name('roles.show');
 
-        Volt::route('/roles/{role}', 'pages.admin.roles.destroy')
-            ->middleware('permission:delete-role')
-            ->name('roles.destroy');
+    Volt::route('/roles/{role}', 'pages.admin.roles.destroy')
+    ->middleware('permission:delete-role')
+    ->name('roles.destroy');
 
         // Rutas para la gestión de permisos
-        Volt::route('/permissions', 'pages.admin.permissions.index')
-            ->middleware('permission:view-permission')
-            ->name('permissions.index');
+    Volt::route('/permissions', 'pages.admin.permissions.index')
+    ->middleware('permission:view-permission')
+    ->name('permissions.index');
 
-        Volt::route('/permissions/create', 'pages.admin.permissions.create')
-            ->middleware('permission:create-permission')
-            ->name('permissions.create');
+    Volt::route('/permissions/create', 'pages.admin.permissions.create')
+    ->middleware('permission:create-permission')
+    ->name('permissions.create');
 
-        Volt::route('/permissions/{permission}/edit', 'pages.admin.permissions.edit')
-            ->middleware('permission:edit-permission')
-            ->name('permissions.edit');
+    Volt::route('/permissions/{permission}/edit', 'pages.admin.permissions.edit')
+    ->middleware('permission:edit-permission')
+    ->name('permissions.edit');
 
-        Volt::route('/permissions/{permission}/show', 'pages.admin.permissions.show')
-            ->middleware('permission:view-permission')
-            ->name('permissions.show');
+    Volt::route('/permissions/{permission}/show', 'pages.admin.permissions.show')
+    ->middleware('permission:view-permission')
+    ->name('permissions.show');
 
-        Volt::route('/permissions/{permission}', 'pages.admin.permissions.destroy')
-            ->middleware('permission:delete-permission')
-            ->name('permissions.destroy');
-    
-
+    Volt::route('/permissions/{permission}', 'pages.admin.permissions.destroy')
+    ->middleware('permission:delete-permission')
+    ->name('permissions.destroy');   
 
         // Rutas para la gestión de configuración
         Volt::route('/settings', 'pages.admin.settings.index')

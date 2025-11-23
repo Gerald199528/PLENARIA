@@ -240,5 +240,17 @@ protected function messages()
     }
     ;?>
     <div>
+    <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => ' Registrar Miembro',
+            ],
+        ]" />
+    </x-slot>
+
         @include('livewire.pages.admin.miembros.from.from', ['mode' => $mode])
     </div>

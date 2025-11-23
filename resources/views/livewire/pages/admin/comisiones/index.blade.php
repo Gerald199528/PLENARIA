@@ -195,34 +195,29 @@ new class extends Component
 
 ?>
 <div>
-    <!-- Breadcrumbs -->
-    <x-slot name="breadcrumbs">
-        <nav class="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 space-x-2" aria-label="Breadcrumb">
-            <a href="{{ route('admin.dashboard') }}" class="hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1">
-                <x-icon name="home" class="w-4 h-4" />
-                Dashboard
-            </a>
-            <span class="text-gray-400 dark:text-gray-500">/</span>
-            <span class="text-gray-700 dark:text-gray-200 flex items-center gap-1">
-                <x-icon name="document-text" class="w-4 h-4" />
-                Listado de Comisiones
-            </span>
-        </nav>
+      <x-slot name="breadcrumbs">
+        <livewire:components.breadcrumb :breadcrumbs="[
+            [
+                'name' => 'Dashboard',
+                'route' => route('admin.dashboard'),
+            ],
+            [
+                'name' => 'Comisiones',
+            ],
+        ]" />
     </x-slot>
-            <!-- Botón Nueva Comisión -->
-                @can('create-comision')
-                <x-slot name="action">
-                    <div class="mt-4">
-            <a x-on:click.prevent=" await Livewire.dispatch('abrir-nueva-comision-modal'); $openModal('comisionModal') " class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg
-                    transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600
-                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400">
-                <i class="fa-solid fa-handshake  animate-bounce"></i>
-                Nueva Comisión
-            </a>
-        </div>
-  </x-slot>
-@endcan
-          <!-- Table Comisión -->
+       <!-- Botón Nueva Comisión -->
+        @can('create-comision')
+        <x-slot name="action">
+            <div class="mt-4">
+                <a x-on:click.prevent="await Livewire.dispatch('abrir-nueva-comision-modal'); $openModal('comisionModal')" class="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400">
+                    <i class="fa-solid fa-handshake animate-bounce"></i>
+                    <span class="hidden sm:inline">Nueva Comisión</span>
+                    <span class="sm:hidden">Nueva</span>
+                </a>
+            </div>
+        </x-slot>
+        @endcan          <!-- Table Comisión -->
     <x-container class="w-full px-4 mt-6">
       <livewire:comisiones-table />    
     </x-container>
