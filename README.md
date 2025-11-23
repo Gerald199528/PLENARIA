@@ -6,5 +6,9 @@
 
 ## Descripción
 
-PLENARIA es una aplicación para gestionar sesiones municipales, acuerdos, crónicas y más.
-```
+  "Con Plenaria, garantizamos el acceso digital simple e inmediato a todos los documentos legales y acuerdos de diferentes Concejos Municipales de Venezuela."  
+  
+Desarrollado por Gerald Peña
+ By Nexa 2.0
+2025 PLENARIA - Todos los derechos reservados.
+
