@@ -14,4 +14,3 @@
 ---
 
 © 2025 PLENARIA - Todos los derechos reservados.
-```
