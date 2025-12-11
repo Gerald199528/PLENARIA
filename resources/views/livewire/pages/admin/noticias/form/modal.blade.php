@@ -8,9 +8,9 @@
                 <i class="fa-solid fa-wand-magic-sparkles animate-bounce text-lg sm:text-xl md:text-2xl text-white flex-shrink-0"></i>
                 <h2 class="text-sm sm:text-base md:text-lg lg:text-2xl font-extrabold tracking-wide truncate">Generador de Contenido con IA</h2>
             </div>
-            <button x-on:click="$closeModal('persistentModal')" class="text-white hover:text-gray-200 transition flex-shrink-0">
+           <x-buttonlabel="Cancel"  x-on:click="close" class="text-white hover:text-gray-200 transition flex-shrink-0"/>
                 <i class="fa-solid fa-xmark w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7"></i>
-            </button>
+         
         </div>
 
         {{-- Info --}}
@@ -35,7 +35,7 @@
                     x-model="prompt"
                     maxlength="1000"
                     rows="4"
-                    placeholder="Ej: Escribe un artículo sobre las nuevas políticas de sostenibilidad de nuestra empresa. Enfócate en el impacto ambiental positivo, las iniciativas implementadas y los objetivos a futuro. Tono profesional y optimista."
+                    placeholder="Ej: Escribe un artículo sobre las nuevas políticas de sostenibilidad de nuestra empresa."
                     wire:model="prompt"
                     class="block w-full p-2 sm:p-3 md:p-4 text-xs sm:text-sm md:text-base rounded-lg sm:rounded-xl md:rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:shadow-lg">
                 </textarea>

@@ -20,7 +20,9 @@ new class extends Component {
     public $destacada = false;
     public $fecha_publicacion;
     public $cronista_id, $cronica_id;
-    
+    public $prompt = '';
+    public $contenidoGenerado = false;
+    public $contenidoGeneradoTemporal = '';
     public $cronistas = [];
     public $cronicas = [];
 
@@ -44,6 +46,96 @@ new class extends Component {
         $this->cronistas = Cronista::all();
         $this->cronicas = Cronica::all();
     }
+
+
+
+    //------------------------------ AI GROQ GENERAR---------------------------------------------
+    public function generarContenido()
+    {
+        // Validar que hay prompt
+        if (empty($this->prompt)) {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Campo requerido',
+                'text' => 'Para generar contenido con IA, debes proporcionar una descripción detallada de lo que deseas crear. Por favor completa el campo de descripción.',
+                'confirmButtonText' => 'Aceptar',
+            ]);
+            return;
+        }
+
+        try {
+            $apiKey = config('services.groq.api_key');
+            
+            if (!$apiKey) {
+                throw new \Exception('GROQ_API_KEY no configurada');
+            }
+
+            $userMessage = $this->prompt;
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+            ])->post(config('services.groq.api_url') . '/chat/completions', [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'Eres un asistente de redacción profesional. Responde siempre en español. Genera contenido de alta calidad, bien estructurado y profesional.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $userMessage
+                    ]
+                ],
+                'max_tokens' => 2048,
+                'temperature' => 0.7,
+            ]);
+
+            if ($response->successful()) {
+                $this->contenidoGeneradoTemporal = $response->json()['choices'][0]['message']['content'];
+                $this->contenidoGenerado = true;
+                
+                $this->dispatch('swal', [
+                    'icon' => 'success',
+                    'title' => '✅ Contenido generado',
+                    'text' => 'Tu contenido ha sido generado exitosamente. Revisa y edita si es necesario.',
+                    'confirmButtonText' => 'OK',
+                ]);
+            } else {
+                throw new \Exception('Error en la API');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Groq Error: ' . $e->getMessage());
+            $this->contenidoGenerado = false;
+            
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => '❌ Error',
+                'text' => 'Ocurrió un error al generar el contenido. Por favor intenta de nuevo.',
+                'confirmButtonText' => 'Reintentar',
+            ]);
+        }
+    }
+
+    public function confirmarContenido()
+    {
+        $this->contenido = $this->contenidoGeneradoTemporal;
+        $this->dispatch('closeModal', 'persistentModal');
+        $this->reset(['prompt', 'contenidoGenerado', 'contenidoGeneradoTemporal']);
+        
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '✅ Contenido confirmado',
+            'text' => 'El contenido ha sido agregado al formulario correctamente.',
+            'confirmButtonText' => 'OK',
+        ]);
+    }
+
+    public function reiniciarModal()
+    {
+        $this->reset(['prompt', 'contenidoGeneradoTemporal', 'contenidoGenerado', 'imagen']);
+    }
+
+
 
     protected function rules()
     {
@@ -100,55 +192,55 @@ new class extends Component {
         'cronica_id.required' => 'Debe seleccionar una crónica.',
         'cronica_id.exists' => 'La crónica seleccionada no existe.',
     ];
-public function validateWithAlert()
-{
-    try {
-        // Solo validar video si es una nueva noticia o si se está cambiando el tipo a video
-        if ($this->tipo === 'video' && !$this->video_archivo && !$this->video_url && !$this->video_archivo_actual) {
+    public function validateWithAlert()
+    {
+        try {
+            // Solo validar video si es una nueva noticia o si se está cambiando el tipo a video
+            if ($this->tipo === 'video' && !$this->video_archivo && !$this->video_url && !$this->video_archivo_actual) {
+                $this->dispatch('showAlert', [
+                    'icon' => 'error',
+                    'title' => 'Error en Video',
+                    'text' => 'Debes proporcionar un archivo de video o una URL para publicaciones de tipo video.',
+                    'timer' => 8000,
+                    'timerProgressBar' => true,
+                ]);
+                return false;
+            }
+
+            $this->validate();
+            return true;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errors = $e->validator->errors();
+            $firstField = array_keys($errors->toArray())[0];
+            $firstError = $errors->first($firstField);
+
+            $fieldNames = [
+                'titulo' => 'Título',
+                'contenido' => 'Contenido',
+                'imagen' => 'Imagen',
+                'archivo_pdf' => 'Archivo PDF',
+                'video_archivo' => 'Archivo de Video',
+                'video_url' => 'URL del Video',
+                'tipo' => 'Tipo de Publicación',
+                'fecha_publicacion' => 'Fecha de Publicación',
+                'cronista_id' => 'Cronista',
+                'cronica_id' => 'Crónica',
+                'destacada' => 'Destacada',
+            ];
+
+            $fieldTitle = $fieldNames[$firstField] ?? 'Campo';
+
             $this->dispatch('showAlert', [
                 'icon' => 'error',
-                'title' => 'Error en Video',
-                'text' => 'Debes proporcionar un archivo de video o una URL para publicaciones de tipo video.',
+                'title' => 'Error en ' . $fieldTitle,
+                'text' => $firstError,
                 'timer' => 8000,
                 'timerProgressBar' => true,
             ]);
+
             return false;
         }
-
-        $this->validate();
-        return true;
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        $errors = $e->validator->errors();
-        $firstField = array_keys($errors->toArray())[0];
-        $firstError = $errors->first($firstField);
-
-        $fieldNames = [
-            'titulo' => 'Título',
-            'contenido' => 'Contenido',
-            'imagen' => 'Imagen',
-            'archivo_pdf' => 'Archivo PDF',
-            'video_archivo' => 'Archivo de Video',
-            'video_url' => 'URL del Video',
-            'tipo' => 'Tipo de Publicación',
-            'fecha_publicacion' => 'Fecha de Publicación',
-            'cronista_id' => 'Cronista',
-            'cronica_id' => 'Crónica',
-            'destacada' => 'Destacada',
-        ];
-
-        $fieldTitle = $fieldNames[$firstField] ?? 'Campo';
-
-        $this->dispatch('showAlert', [
-            'icon' => 'error',
-            'title' => 'Error en ' . $fieldTitle,
-            'text' => $firstError,
-            'timer' => 8000,
-            'timerProgressBar' => true,
-        ]);
-
-        return false;
     }
-}
 
     public function save()
     {
