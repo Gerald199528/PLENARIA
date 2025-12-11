@@ -1,6 +1,6 @@
 # PLENARIA 2.0
 
-![Plenaria App](images/plenaria.png)
+![Plenaria App](Logos Plenaria/logo plenaria/1_logo.png)
 
 ## Descripción
 
