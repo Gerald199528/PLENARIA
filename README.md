@@ -1,7 +1,4 @@
-# PLENARIA 2.0
-
-![Plenaria App](images/plenaria.png)
-
+# PLENARIA 2.0.1
 ## Descripción
 
 "Con Plenaria, garantizamos el acceso digital simple e inmediato a todos los documentos legales y acuerdos de diferentes Concejos Municipales de Venezuela."
