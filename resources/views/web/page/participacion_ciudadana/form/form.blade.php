@@ -103,7 +103,24 @@
             <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
         @enderror
     </div>
-
+<!-- Comisión -->
+<div>
+    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Comisiónes disponibles</label>
+    <select name="comision_id" id="comision_id"
+        class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all @error('comision_id') border-red-500 @enderror">
+        <option value="">Seleccione una comisión</option>
+        @forelse($comisiones as $comision)
+            <option value="{{ $comision->id }}" {{ old('comision_id') == $comision->id ? 'selected' : '' }}>
+                {{ $comision->nombre }}
+            </option>
+        @empty
+            <option value="" disabled>No hay comisiones disponibles</option>
+        @endforelse
+    </select>
+    @error('comision_id')
+        <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+    @enderror
+</div>
     <!-- Motivo de Solicitud -->
     <div>
         <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Motivo de Solicitud del Derecho de Palabra*</label>
@@ -150,4 +167,4 @@
     }
 </style>
 
-@include('web.page.participacion_ciudadana.js.script')
+@include('web.page.participacion_ciudadana.js.sweetalert')

@@ -199,12 +199,19 @@ function actualizarEstadisticasBarras(datos, etiquetas) {
     const menor = Math.min(...datos);
     const indexMayor = datos.indexOf(mayor);
 
-    document.getElementById('totalSesiones').textContent = total;
-    document.getElementById('promedioSesiones').textContent = promedio;
-    document.getElementById('mayorMesSesiones').textContent = mayor;
-    document.getElementById('menorMesSesiones').textContent = menor;
-    document.getElementById('mesDestacado').textContent = etiquetas[indexMayor];
-    document.getElementById('sesionesDestacado').textContent = mayor;
+    const safeSet = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    safeSet('totalSesiones', total);
+    safeSet('promedioSesiones', promedio);
+    safeSet('mayorMesSesiones', mayor);
+    safeSet('menorMesSesiones', menor);
+
+    // Estos dos solo se aplicarán si los elementos existen
+    safeSet('mesDestacado', etiquetas[indexMayor]);
+    safeSet('sesionesDestacado', mayor);
 }
 
 function initBarChart(datosSesiones = [], mesesSesiones = []) {

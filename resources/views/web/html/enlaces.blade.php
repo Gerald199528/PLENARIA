@@ -1,8 +1,5 @@
 
-           
-           
-           
-             <!-- Sección de Accesos Rápidos -->
+                <!-- Sección de Accesos Rápidos -->
                 <section class="py-16 bg-white relative overflow-hidden">
                     <!-- Elementos decorativos -->
                     <div class="absolute top-0 left-0 w-64 h-64 bg-blue-50 rounded-full -translate-x-32 -translate-y-32"></div>

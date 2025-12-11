@@ -1,5 +1,4 @@
 <?php
-
 use Livewire\Volt\Component;
 use App\Models\Miembro;
 use App\Models\Comision;
@@ -8,9 +7,12 @@ use App\Models\Noticia;
 use App\Models\DerechoDePalabra;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 
-new class extends Component {
-    // Variables de ejemplo
+new class extends Component {  
     public $lineData = [];
     public $barData = [];
     public $doughnutData = [];
@@ -195,6 +197,237 @@ public function cargarDatosGraficaTorta()
             $this->suggestion = '';
         }
     }
+    
+// Método para PDF de Gráfica de Línea
+
+#[On('generateLineChartPDF')]
+#[Rule('renderless')] 
+public function generateLineChartPDF($chartImage)
+{
+    try {
+        $logoPath = Setting::get('logo_horizontal');
+        $logoIcon = null;
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            $imageContent = Storage::disk('public')->get($logoPath);
+            $mimeType = Storage::disk('public')->mimeType($logoPath);
+            $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+        }
+
+        $primaryColor = Setting::get('primary_color', '#0f2440');
+        $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+        $fields = [
+            ['label' => 'Total Solicitudes', 'value' => array_sum($this->datosAprobadas) + array_sum($this->datosPendientes) + array_sum($this->datosRechazadas), 'highlight' => true],
+            ['label' => 'Aprobadas', 'value' => array_sum($this->datosAprobadas)],
+            ['label' => 'Pendientes', 'value' => array_sum($this->datosPendientes)],
+            ['label' => 'Rechazadas', 'value' => array_sum($this->datosRechazadas)],
+            ['label' => 'Período', 'value' => '12 meses'],
+            ['label' => 'Generado', 'value' => now()->format('d/m/Y H:i')],
+        ];
+
+        $html = view('livewire.pages.admin.pdf.pdf-layout', [
+            'fields' => $fields,
+            'title' => 'Participación Ciudadana',
+            'subtitle' => 'Análisis Mensual de Solicitudes',
+            'logo_icon' => $logoIcon,
+            'primaryColor' => $primaryColor,
+            'secondaryColor' => $secondaryColor,
+            'tags' => ['Participación', 'Ciudadana', 'Análisis', 'Solicitudes'],
+            'badgeTitle' => 'Resumen de Solicitudes',
+            'sectionTitle' => 'Estadísticas de Participación',
+            'chartImage' => $chartImage
+        ])->render();
+
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setOption('encoding', 'UTF-8')
+            ->setOption('default_font', 'DejaVu Sans')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('enable_remote', true);
+
+        $filename = "participacion_ciudadana_" . now()->format('d-m-Y_H-i') . ".pdf";
+        
+        // Guardar en public/temp/
+        $tempDir = public_path('temp');
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        
+        file_put_contents($tempDir . '/' . $filename, $pdf->output());
+
+        // Disparar descarga
+        $this->dispatch('downloadPDF', filename: $filename);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en generateLineChartPDF: ' . $e->getMessage());
+        
+        $this->dispatch('showAlert', [
+            'icon' => 'error',
+            'title' => 'Error',
+            'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+        ]);
+    }
+}
+
+
+// Método para PDF de Gráfica de Barras
+#[On('generateBarChartPDF')]
+#[Rule('renderless')] 
+public function generateBarChartPDF($chartImage)
+{
+    try {
+        $logoPath = Setting::get('logo_horizontal');
+        $logoIcon = null;
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            $imageContent = Storage::disk('public')->get($logoPath);
+            $mimeType = Storage::disk('public')->mimeType($logoPath);
+            $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+        }
+
+        $primaryColor = Setting::get('primary_color', '#0f2440');
+        $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+        // Calcular estadísticas de sesiones
+        $totalSesiones = array_sum($this->datosSesiones);
+        $promedio = count($this->datosSesiones) > 0 ? number_format(array_sum($this->datosSesiones) / count($this->datosSesiones), 1) : 0;
+        $mayor = count($this->datosSesiones) > 0 ? max($this->datosSesiones) : 0;
+        $menor = count($this->datosSesiones) > 0 ? min($this->datosSesiones) : 0;
+
+        $fields = [
+            ['label' => 'Total Sesiones', 'value' => $totalSesiones, 'highlight' => true],
+            ['label' => 'Promedio Mensual', 'value' => $promedio],
+            ['label' => 'Mayor Mes', 'value' => $mayor],
+            ['label' => 'Menor Mes', 'value' => $menor],
+            ['label' => 'Período', 'value' => '12 meses'],
+            ['label' => 'Generado', 'value' => now()->format('d/m/Y H:i')],
+        ];
+
+        $html = view('livewire.pages.admin.pdf.pdf-layout', [
+            'fields' => $fields,
+            'title' => 'Sesiones Municipales',
+            'subtitle' => 'Análisis Mensual de Sesiones Completadas',
+            'logo_icon' => $logoIcon,
+            'primaryColor' => $primaryColor,
+            'secondaryColor' => $secondaryColor,
+            'tags' => ['Sesiones', 'Municipales', 'Análisis', 'Completadas'],
+            'badgeTitle' => 'Resumen de Sesiones',
+            'sectionTitle' => 'Estadísticas de Sesiones Completadas',
+            'chartImage' => $chartImage
+        ])->render();
+
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setOption('encoding', 'UTF-8')
+            ->setOption('default_font', 'DejaVu Sans')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('enable_remote', true);
+
+        $filename = "sesiones_completadas_" . now()->format('d-m-Y_H-i') . ".pdf";
+        
+        // Guardar en public/temp/
+        $tempDir = public_path('temp');
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        
+        file_put_contents($tempDir . '/' . $filename, $pdf->output());
+
+        // Disparar descarga
+        $this->dispatch('downloadPDF', filename: $filename);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en generateBarChartPDF: ' . $e->getMessage());
+        
+        $this->dispatch('showAlert', [
+            'icon' => 'error',
+            'title' => 'Error',
+            'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+        ]);
+    }
+}
+
+// Método para PDF de Gráfica de Torta (Doughnut)
+#[On('generateDoughnutChartPDF')]
+#[Rule('renderless')] 
+public function generateDoughnutChartPDF($chartImage)
+{
+    try {
+        $logoPath = Setting::get('logo_horizontal');
+        $logoIcon = null;
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            $imageContent = Storage::disk('public')->get($logoPath);
+            $mimeType = Storage::disk('public')->mimeType($logoPath);
+            $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+        }
+
+        $primaryColor = Setting::get('primary_color', '#0f2440');
+        $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+        // Calcular estadísticas de comisiones
+        $totalConcejales = array_sum($this->comisionesData);
+        $totalComisiones = count($this->comisionesData);
+        $mayorCantidad = count($this->comisionesData) > 0 ? max($this->comisionesData) : 0;
+        $promedioCantidad = $totalComisiones > 0 ? number_format($totalConcejales / $totalComisiones, 1) : 0;
+
+        $fields = [
+            ['label' => 'Total Concejales', 'value' => $totalConcejales, 'highlight' => true],
+            ['label' => 'Total Comisiones', 'value' => $totalComisiones],
+            ['label' => 'Mayor Cantidad', 'value' => $mayorCantidad],
+            ['label' => 'Promedio', 'value' => $promedioCantidad],
+            ['label' => 'Período', 'value' => 'Actual'],
+            ['label' => 'Generado', 'value' => now()->format('d/m/Y H:i')],
+        ];
+
+        $html = view('livewire.pages.admin.pdf.pdf-layout', [
+            'fields' => $fields,
+            'title' => 'Distribución por Comisiones',
+            'subtitle' => 'Análisis de Concejales Activos',
+            'logo_icon' => $logoIcon,
+            'primaryColor' => $primaryColor,
+            'secondaryColor' => $secondaryColor,
+            'tags' => ['Comisiones', 'Concejales', 'Distribución', 'Análisis'],
+            'badgeTitle' => 'Resumen de Comisiones',
+            'sectionTitle' => 'Estadísticas de Distribución',
+            'chartImage' => $chartImage
+        ])->render();
+
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setOption('encoding', 'UTF-8')
+            ->setOption('default_font', 'DejaVu Sans')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('enable_remote', true);
+
+        $filename = "distribucion_comisiones_" . now()->format('d-m-Y_H-i') . ".pdf";
+        
+        // Guardar en public/temp/
+        $tempDir = public_path('temp');
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+        
+        file_put_contents($tempDir . '/' . $filename, $pdf->output());
+
+        // Disparar descarga
+        $this->dispatch('downloadPDF', filename: $filename);
+        
+    } catch (\Exception $e) {
+        \Log::error('Error en generateDoughnutChartPDF: ' . $e->getMessage());
+        
+        $this->dispatch('showAlert', [
+            'icon' => 'error',
+            'title' => 'Error',
+            'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+        ]);
+    }
+}
+
 };
 ?>
 
@@ -286,5 +519,167 @@ public function cargarDatosGraficaTorta()
 </div>
 
 @push('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<script>
+       // chart lineas
+    window.downloadLineChartPDF = function () {
+        const canvas = document.getElementById('lineChart');
+
+        if (!canvas) {
+            Swal.fire({
+                title: 'Sin datos',
+                text: 'No hay gráfica disponible',
+                icon: 'warning',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Generando PDF',
+            text: 'Por favor espera...',
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+
+        try {
+            const chartImage = canvas.toDataURL('image/png', 1.0);
+            Livewire.dispatch('generateLineChartPDF', { chartImage: chartImage });
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.close();
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al procesar la gráfica',
+                icon: 'error',
+                confirmButtonColor: '#3085d6'
+            });
+        }
+    }
+
+    // Escuchar evento de descarga desde Livewire
+    Livewire.on('downloadPDF', (data) => {
+        const { filename } = data;
+        
+        const link = document.createElement('a');
+        link.href = `/temp/${filename}`;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        Swal.close();
+    });
+
+    // Escuchar evento de alerta
+    Livewire.on('showAlert', (data) => {
+        Swal.fire(data);
+    });
+</script>
+
+<script>
+      // chart barras
+    function downloadBarPDF(chartId) {
+    const canvas = document.getElementById(chartId);    
+    if (!canvas) {
+        Swal.fire({
+            title: 'Sin datos',
+            text: 'No hay gráfica disponible',
+            icon: 'warning',
+            confirmButtonColor: '#3085d6'
+        });
+        return;
+    }
+    Swal.fire({
+        title: 'Generando PDF',
+        text: 'Por favor espera...',
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    });
+    try {
+        const chartImage = canvas.toDataURL('image/png', 1.0);
+        Livewire.dispatch('generateBarChartPDF', { chartImage: chartImage });
+
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.close();
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al procesar la gráfica',
+            icon: 'error',
+            confirmButtonColor: '#3085d6'
+        });
+    }}
+</script>
+
+
+<script>
+// chart torta - MEJORADO
+function downloadDoughnutPDF() {
+    const canvas = document.getElementById('doughnutChart');    
+    if (!canvas) {
+        Swal.fire({
+            title: 'Sin datos',
+            text: 'No hay gráfica disponible',
+            icon: 'warning',
+            confirmButtonColor: '#3085d6'
+        });
+        return;
+    }  
+    window.comisionesDataBeforePDF = [...window.comisionesDataGlobal];
+    window.comisionesLabelsBeforePDF = [...window.comisionesLabelsGlobal];
+    window.comisionesColoresBeforePDF = [...window.comisionesColoresGlobal];
+    Swal.fire({
+        title: 'Generando PDF',
+        text: 'Por favor espera...',
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        allowEscapeKey: false
+    });
+    try {
+        const chartImage = canvas.toDataURL('image/png', 1.0);
+        Livewire.dispatch('generateDoughnutChartPDF', { chartImage: chartImage });
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.close();
+        Swal.fire({
+            title: 'Error',
+            text: 'Error al procesar la gráfica',
+            icon: 'error',
+            confirmButtonColor: '#3085d6'
+        });
+    }
+}
+Livewire.on('downloadPDF', (data) => {
+    const { filename } = data;    
+    const link = document.createElement('a');
+    link.href = `/temp/${filename}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);    
+    Swal.close();   
+    setTimeout(() => {
+        if (window.comisionesDataBeforePDF && window.comisionesLabelsBeforePDF) {
+            window.comisionesDataGlobal = window.comisionesDataBeforePDF;
+            window.comisionesLabelsGlobal = window.comisionesLabelsBeforePDF;
+            window.comisionesColoresGlobal = window.comisionesColoresBeforePDF;
+            initDoughnutChart(window.comisionesLabelsGlobal, window.comisionesDataGlobal, window.comisionesColoresGlobal);
+        }
+    }, 500);
+});
+Livewire.on('showAlert', (data) => {
+    Swal.fire(data);
+});
+</script>
 @endpush

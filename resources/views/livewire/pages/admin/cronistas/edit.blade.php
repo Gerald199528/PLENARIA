@@ -232,10 +232,7 @@ new #[Title('Editar Cronista')] class extends Component
             ['name' => 'Editar Cronista'],
         ]" />
     </x-slot>
-        <x-container class="lg:py-8 lg:px-50  ">
-        <x-card>    
-    <div class="border-t rounded-3xl  border-gray-200 dark:border-gray-600"></div>
+  
     @include('livewire.pages.admin.cronistas.form.form-cronista', ['showForm' => true,'editForm' => true, 'mode' => 'edit']) 
-    </x-card>
-    </x-container>
+ 
     </div>

@@ -1,4 +1,4 @@
-<div class="p-4 sm:p-6 md:p-10 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-4xl mx-auto border border-gray-200 dark:border-gray-700">
+<div class="p-4 sm:p-6 md:p-10 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-6xl mx-auto border border-gray-200 dark:border-gray-700">
 
     <!-- Encabezado -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 border-b pb-4 border-gray-300 dark:border-gray-700 gap-4">

@@ -1,5 +1,3 @@
-<!-- resources/views/web/script/script.blade.php -->
-
 <script>
     // Inicializar AOS
     AOS.init({
@@ -7,7 +5,6 @@
         once: true,
         easing: 'ease-out-cubic'
     });
-
     // Navbar scroll effect
     window.addEventListener('scroll', function() {
         const navbar = document.getElementById('navbar');
@@ -17,28 +14,46 @@
             navbar.classList.remove('navbar-scroll');
         }
     });
-
-    // Mobile menu toggle
-    document.getElementById('menu-toggle')?.addEventListener('click', function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
-
-    // Smooth scroll for navigation links
+document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu'); 
+    let canCloseOnScroll = true; 
+    const SCROLL_DEBOUNCE_DELAY = 100; 
+    if (menuToggle && mobileMenu) {
+        menuToggle.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.toggle('hidden');
+            if (!isOpen) { 
+                canCloseOnScroll = false;
+                setTimeout(() => {
+                    canCloseOnScroll = true;
+                }, SCROLL_DEBOUNCE_DELAY);
+            }
+        });
+        window.addEventListener('scroll', () => {
+            const isMenuOpen = !mobileMenu.classList.contains('hidden');
+            if (isMenuOpen && canCloseOnScroll) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    }
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
+
+            if (target) {            
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
-                document.getElementById('mobile-menu')?.classList.add('hidden');
+                if (mobileMenu) {
+                    mobileMenu.classList.add('hidden');
+                    canCloseOnScroll = true; 
+                }
             }
         });
     });
-
+});
     // Counter animations
     function animateCounter(element, target, duration = 2000) {
         let start = 0;
@@ -78,12 +93,10 @@
             }
         });
     });
-
     const heroSection = document.querySelector('#inicio');
     if (heroSection) {
         counterObserver.observe(heroSection);
     }
-
     // Back to top button
     const backToTopButton = document.getElementById('backToTop');
     
@@ -114,7 +127,6 @@
             img.classList.add('img-loading');
         }
     });
-
     // Enhanced hover effects for cards
     document.querySelectorAll('.card-hover').forEach(card => {
         card.addEventListener('mouseenter', function() {
@@ -138,9 +150,6 @@ document.querySelectorAll('form:not(#formularioDerechoPalabra)').forEach(form =>
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<div class="spinner mr-2"></div> <span class="text-white">Enviando...</span>';
         submitBtn.disabled = true;
-        
-        // El spinner sigue hasta que la página se recargue o maneje la respuesta
-        // NO reiniciamos el botón automáticamente
     });
 });
     // Progressive loading for content
@@ -170,8 +179,7 @@ document.querySelectorAll('form:not(#formularioDerechoPalabra)').forEach(form =>
         '%cEste sitio web está optimizado para la transparencia y participación ciudadana.',
         'color: #6b7280; font-size: 14px;'
     );
-
-    // ⭐ SISTEMA DE COLORES DINÁMICOS
+   
     // Escuchar eventos de Livewire cuando se actualizan los colores
     document.addEventListener('livewire:navigated', function() {
         if (typeof Livewire !== 'undefined') {
@@ -180,7 +188,6 @@ document.querySelectorAll('form:not(#formularioDerechoPalabra)').forEach(form =>
             });
         }
     });
-
     // Función para actualizar los colores
     function actualizarColores(primaryColor, buttonColor) {
         const root = document.documentElement;

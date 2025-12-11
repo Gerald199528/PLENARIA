@@ -1,24 +1,26 @@
 @props(['title' => config('app.name', 'Laravel')])
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ $title }} | {{ config('app.name') }}</title>
-
+    <title>{{ $title }} | {{ config('app.name') }}</title>    
+    <!------------------------------------------------------------------------------------------>
+                                        <!-- Logo PLENARIA-->
+    @php
+    $faviconPath = \App\Models\Setting::get('logo_icon'); 
+    $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('default-favicon.ico');
+    @endphp
+    <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <!------------------------------------------------------------------------------------------>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-
-
     <style>
         [x-cloak] {
             display: none !important;
@@ -89,8 +91,7 @@
             {{ $slot }}
         </main>
     @endif
-
-
+    
     @livewireScripts
     @wireUiScripts
     @stack('scripts')
@@ -108,7 +109,6 @@
         Livewire.on('swal', data => {
             Swal.fire(data[0]);
         });
-
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('showAlert', (data) => {
                 Swal.fire({
@@ -121,17 +121,5 @@
             });
         });
     </script>
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            /* Echo.channel('notification')
-                .listen('NotificationSend', (e) => {
-                    console.log('se ha generado una notificación');
-                }); */
-
-        });
-    </script>
-
 </body>
-
 </html>

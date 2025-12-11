@@ -1,7 +1,9 @@
 <?php
-
 use Livewire\Volt\Component;
 use App\Models\Concejal;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 new class extends Component {
     
     public function deleteConcejal($concejalId)
@@ -39,6 +41,80 @@ new class extends Component {
             ]);
         }
     }
+public function downloadConcejalpdf($concejalId)
+{
+    try {
+        $concejal = Concejal::with('comisions')->findOrFail($concejalId);
+
+        $logoPath = Setting::get('logo_horizontal');
+        $logoIcon = null;
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            $imageContent = Storage::disk('public')->get($logoPath);
+            $mimeType = Storage::disk('public')->mimeType($logoPath);
+            $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+        }
+
+        // Obtener imagen del concejal si existe
+        $image = null;
+        if ($concejal->imagen_url) {
+            $path = storage_path('app/public/' . $concejal->imagen_url);
+            if (file_exists($path)) {
+                $imageContent = file_get_contents($path);
+                $mimeType = mime_content_type($path);
+                $image = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }
+        }
+
+        $primaryColor = Setting::get('primary_color', '#0f2440');
+        $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+        $fields = [
+            ['label' => 'Cédula', 'value' => $concejal->cedula],
+            ['label' => 'Nombre', 'value' => $concejal->nombre],
+            ['label' => 'Apellido', 'value' => $concejal->apellido],
+            ['label' => 'Teléfono', 'value' => $concejal->telefono ?? 'N/A'],
+            ['label' => 'Cargo', 'value' => $concejal->cargo ?? 'N/A'],
+            ['label' => 'Fecha Nacimiento', 'value' => $concejal->fecha_nacimiento ? \Carbon\Carbon::parse($concejal->fecha_nacimiento)->format('d/m/Y') : 'N/A'],
+            ['label' => 'Perfil', 'value' => $concejal->perfil ?? 'N/A'],
+            ['label' => 'Creado', 'value' => $concejal->created_at->format('d/m/Y H:i')],
+        ];
+
+        $tags = $concejal->comisions->pluck('nombre')->toArray();
+
+        $html = view('livewire.pages.admin.pdf.pdf-layout', [
+            'fields' => $fields,
+            'title' => $concejal->nombre . ' ' . $concejal->apellido,
+            'subtitle' => 'Información del Concejal',
+            'logo_icon' => $logoIcon,
+            'image' => $image,
+            'primaryColor' => $primaryColor,
+            'secondaryColor' => $secondaryColor,
+            'tags' => $tags,
+            'badgeTitle' => 'Comisiones',
+            'sectionTitle' => 'Datos del Concejal'
+        ])->render();
+
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setOption('encoding', 'UTF-8')
+            ->setOption('default_font', 'DejaVu Sans');
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, "concejal_{$concejal->id}.pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+
+    } catch (\Exception $e) {
+        $this->dispatch('showAlert', [
+            'icon' => 'error',
+            'title' => 'Error',
+            'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+        ]);
+    }
+}
 }; ?>
 
 <div>

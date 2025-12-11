@@ -1,6 +1,3 @@
-<!-- resources/views/web/styles/csss.blade.php -->
-
-<!-- ⭐ ESTILOS DINÁMICOS - PRIMERO QUE TODO -->
 <style>
     :root {
         --primary-color: {{ \App\Models\Setting::get('primary_color', '#1d4ed8') }};
@@ -15,11 +12,8 @@
         --shadow-large: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
     }
 </style>
-
-
 <!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <!-- AOS CSS -->
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 

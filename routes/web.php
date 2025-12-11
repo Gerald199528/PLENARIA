@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\InstrumentosLegalesController;
@@ -77,6 +76,9 @@ Route::get('/', function () {
     $derechoController = new \App\Http\Controllers\DerechodePalabraController();
     $estadisticas = $derechoController->getEstadisticas();
     
+    // ← AGREGAR ESTAS 2 LÍNEAS
+    $comisiones = \App\Models\Comision::all();
+    
     return view('welcome', [
         'empresa' => $empresa,
         'noticiaPrincipal' => $noticiaPrincipal,
@@ -93,45 +95,24 @@ Route::get('/', function () {
         'logo' => \App\Models\Setting::get('logo'),
         'logoBackgroundSolid' => \App\Models\Setting::get('logo_background_solid'),
         'organigramaSize' => $organigramaSize,
+        'comisiones' => $comisiones,  
     ]);
     
 })->name('home');
-
-    Route::resource('instrumentos_legales', InstrumentosLegalesController::class);
-
+Route::resource('instrumentos_legales', InstrumentosLegalesController::class);
 // En tu archivo routes/web.php
 Route::get('/noticias', [NoticiaCompletaController::class, 'index'])->name('web.page.noticias.index');
 Route::get('/videos', [NoticiaCompletaController::class, 'videos'])->name('web.page.noticias.videos');
 Route::get('/noticias/{id}', [NoticiaCompletaController::class, 'show'])->name('web.page.noticias.show');
 Route::resource('derecho-palabra', DerechodePalabraController::class, ['only' => ['create', 'store']]);
-Route::get('/participacion-ciudadana', [SesionMunicipalController::class, 'index'])
-    ->name('web.page.participacion_ciudadana.index');
-Route::get('/participacion-ciudadana/estadisticas', [SesionMunicipalController::class, 'show'])
-    ->name('web.page.participacion_ciudadana.show');
-
-
-
-
-
-
-
-
-
+Route::get('/participacion-ciudadana', [SesionMunicipalController::class, 'index'])->name('web.page.participacion_ciudadana.index');
+Route::get('/participacion-ciudadana/estadisticas', [SesionMunicipalController::class, 'show'])->name('web.page.participacion_ciudadana.show');
 Route::middleware(['auth'])->group(function () {
-
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
     Route::get('/settings/profile', function () {
         return view('livewire.pages.patient.settings.profile');
     })->name('settings.profile');
-
-    /* Route::redirect('settings', 'settings/profile');
-
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance'); */
 });
-
 require __DIR__.'/auth.php';

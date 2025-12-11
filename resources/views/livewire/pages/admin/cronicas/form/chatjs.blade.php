@@ -1,3 +1,4 @@
+
 <!-- Gráfica -->
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 md:p-8 border border-gray-200 dark:border-gray-700 mb-6 sm:mb-8" 
      id="chartWrapper"
@@ -56,7 +57,6 @@
     let lastChartSum = 0;
 
     function getChartColors() {
-        // Detectar modo oscuro con múltiples métodos
         const hasClass = document.documentElement.classList.contains('dark');
         const hasAttr = document.documentElement.getAttribute('data-theme') === 'dark';
         const prefersScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -84,7 +84,6 @@
             return;
         }
 
-        // Leer datos directamente del atributo del DOM (lo que Livewire actualiza)
         const chartReadyStr = wrapper.getAttribute('data-chart-ready');
         const chartSumStr = wrapper.getAttribute('data-chart-sum');
         const labelsStr = wrapper.getAttribute('data-chart-labels');
@@ -105,13 +104,11 @@
 
         console.log(' Datos cargados - Sum:', chartSum, 'Ready:', isReady);
 
-        // Destruir gráfica anterior
         if (cronicasBarChart) {
             cronicasBarChart.destroy();
             cronicasBarChart = null;
         }
 
-        // Decidir si mostrar gráfica o empty state
         const hasData = isReady && labels && Array.isArray(labels) && labels.length > 0 && chartSum > 0;
 
         if (!hasData) {
@@ -121,7 +118,6 @@
             return;
         }
 
-        // Mostrar canvas
         canvas.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
 
@@ -188,14 +184,12 @@
         }
     }
 
-    // Polling para detectar cambios en los atributos del DOM
     setInterval(() => {
         const wrapper = document.getElementById('chartWrapper');
         if (!wrapper) return;
 
         const currentSum = parseInt(wrapper.getAttribute('data-chart-sum')) || 0;
         
-        // Si el sum cambió, reinitializar
         if (currentSum !== lastChartSum) {
             console.log(`Cambio detectado: ${lastChartSum} -> ${currentSum}`);
             lastChartSum = currentSum;
@@ -203,7 +197,6 @@
         }
     }, 500);
 
-    // Observer para cambios de tema EN TIEMPO REAL
     const observer = new MutationObserver((mutations) => {
         for (let mutation of mutations) {
             if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme')) {
@@ -211,17 +204,13 @@
                 if (cronicasBarChart) {
                     const colors = getChartColors();
                     
-                    // Actualizar TODOS los colores del gráfico
-                
                     cronicasBarChart.options.plugins.legend.labels.color = colors.textColor;
                     cronicasBarChart.options.plugins.tooltip.backgroundColor = colors.bgTooltip;
                     cronicasBarChart.options.plugins.datalabels.color = colors.textColor;
                     cronicasBarChart.options.scales.y.grid.color = colors.gridColor;
                     
-                    // Forzar actualización del canvas
                     cronicasBarChart.update('none');
                 } else {
-                    // Si el gráfico no existe pero se cambió el tema, reinicializar
                     initChart();
                 }
             }
@@ -233,22 +222,18 @@
         attributeFilter: ['class', 'data-theme']
     });
 
-    // Inicializar cuando el DOM esté listo
     document.addEventListener('DOMContentLoaded', () => {
         console.log('DOM Ready - inicializando gráfica');
         initChart();
     });
 
-    // Escuchar eventos de Livewire
     if (window.Livewire) {
-        // Para Livewire 3
         Livewire.hook('morph.updated', () => {
             console.log('Livewire morph.updated - reinicializando');
             setTimeout(initChart, 100);
         });
     }
 
-    // También con el evento genérico
     document.addEventListener('livewire:updated', () => {
         console.log('Livewire updated event');
         setTimeout(initChart, 100);
@@ -267,6 +252,55 @@
             });
         });
     });
+
+    // Función para descargar PDF con gráfica
+    function downloadChartPDFWithInfo() {
+        const canvas = document.getElementById('cronicasBarChart');
+        
+        if (!canvas || canvas.style.display === 'none') {
+            Swal.fire({
+                title: 'Sin datos',
+                text: 'No hay datos para descargar',
+                icon: 'warning',
+                confirmButtonColor: '#3085d6'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Generando PDF',
+            text: 'Por favor espera...',
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+
+        try {
+            // Convertir canvas a imagen PNG
+            const chartImage = canvas.toDataURL('image/png', 1.0);
+
+            // Despachar evento Livewire
+            Livewire.dispatch('generatePdfWithChart', {
+                chartImage: chartImage
+            });
+
+            setTimeout(() => {
+                Swal.close();
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.close();
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al procesar la gráfica',
+                icon: 'error',
+                confirmButtonColor: '#3085d6'
+            });
+        }
+    }
     </script>
 
 @endpush

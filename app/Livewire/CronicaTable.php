@@ -45,42 +45,40 @@ final class CronicaTable extends PowerGridComponent
     {
         return [];
     }
-public function fields(): PowerGridFields
-{
-    return PowerGrid::fields([
-        'titulo',
-        'contenido',
-        'archivo_pdf',
-        'cronista_id',
-        'categoria_id',
-    ])
-    ->add('cronista_nombre', function ($model) {
-        if ($model->cronista) {
-            return $model->cronista->nombre_completo . ' ' . $model->cronista->apellido_completo;
-        }
-        return 'Sin cronista';
-    })
-->add('categoria_nombre', function ($model) {
-    return $model->categoria
-        ? $model->categoria->nombre
-        : '<span class="text-gray-400 italic">Sin categoría</span>';
-})
 
-
-    ->add('fecha_publicacion_formatted', fn($model) => Carbon::parse($model->fecha_publicacion)
-        ->timezone('America/Caracas')
-        ->format('d/m/Y h:i A'))
-    ->add('created_at_formatted', fn($model) => Carbon::parse($model->created_at)
-        ->timezone('America/Caracas')
-        ->format('d/m/Y h:i A'))
-    ->add('archivo_pdf_formatted', function ($model) {
-        if ($model->archivo_pdf) {
-            return basename($model->archivo_pdf);
-        }
-        return 'Sin archivo';
-    });
-}
-
+    public function fields(): PowerGridFields
+    {
+        return PowerGrid::fields([
+            'titulo',
+            'contenido',
+            'archivo_pdf',
+            'cronista_id',
+            'categoria_id',
+        ])
+        ->add('cronista_nombre', function ($model) {
+            if ($model->cronista) {
+                return $model->cronista->nombre_completo . ' ' . $model->cronista->apellido_completo;
+            }
+            return 'Sin cronista';
+        })
+        ->add('categoria_nombre', function ($model) {
+            return $model->categoria
+                ? $model->categoria->nombre
+                : '<span class="text-gray-400 italic">Sin categoría</span>';
+        })
+        ->add('fecha_publicacion_formatted', fn($model) => Carbon::parse($model->fecha_publicacion)
+            ->timezone('America/Caracas')
+            ->format('d/m/Y h:i A'))
+        ->add('created_at_formatted', fn($model) => Carbon::parse($model->created_at)
+            ->timezone('America/Caracas')
+            ->format('d/m/Y h:i A'))
+        ->add('archivo_pdf_formatted', function ($model) {
+            if ($model->archivo_pdf) {
+                return basename($model->archivo_pdf);
+            }
+            return 'Sin archivo';
+        });
+    }
 
     public function columns(): array
     {
@@ -106,21 +104,19 @@ public function fields(): PowerGridFields
                 ->searchable()
                 ->bodyAttribute('text-center'),
 
-Column::make('Cronista', 'cronista_nombre')
-    ->sortable()
-    ->searchable()
-    ->bodyAttribute('text-center'),
+            Column::make('Cronista', 'cronista_nombre')
+                ->sortable()
+                ->searchable()
+                ->bodyAttribute('text-center'),
 
-Column::make('Categoría', 'categoria_nombre')
-    ->sortable()
-    ->searchable()
-    ->bodyAttribute('text-center'),
-
+            Column::make('Categoría', 'categoria_nombre')
+                ->sortable()
+                ->searchable()
+                ->bodyAttribute('text-center'),
 
             Column::make('Fecha Publicación', 'fecha_publicacion_formatted', 'fecha_publicacion')
                 ->sortable()
                 ->bodyAttribute('text-center'),
-
         ];
     }
 
@@ -139,31 +135,40 @@ Column::make('Categoría', 'categoria_nombre')
     public function actions(Cronica $row): array
     {
         return [
-    
-            // Botón Editar
-            Button::add('edit')
-            ->slot('<i class="fas fa-edit"></i>')
-            ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
-            ->route('admin.cronicas.edit', ['cronica' => $row->id])
-                ->attributes(['wire:navigate' => true]),
-    
+            // Botón Descargar
+            Button::add('download_pdf')
+                ->slot('<i class="fas fa-download"></i>')
+                ->class('bg-emerald-600 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-md hover:bg-emerald-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-200 transform hover:scale-105')
+                ->attributes([
+                    'onclick' => "const link = document.createElement('a');
+                                link.href = '" . asset('storage/' . $row->archivo_pdf) . "';
+                                link.download = '" . basename($row->archivo_pdf) . "';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);",
+                    'title' => 'Descargar'
+                ]),
 
-                        // Botón Ver PDF (ahora aquí en acciones)
-       Button::add('view')
+// Botón Ver PDF
+Button::add('view')
     ->slot('<i class="fas fa-eye"></i>')
-    ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+    ->class('bg-amber-500 text-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-amber-600 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
     ->attributes([
         'onclick' => "window.open('" . asset('storage/' . $row->archivo_pdf) . "', '_blank')",
         'title' => 'Ver documento'
     ]),
+            // Botón Editar
+            Button::add('edit')
+                ->slot('<i class="fas fa-edit"></i>')
+                ->class('bg-indigo-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-indigo-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+                ->route('admin.cronicas.edit', ['cronica' => $row->id])
+                ->attributes(['wire:navigate' => true]),
 
             // Botón Eliminar
-              Button::add('delete')
-            ->slot('<i class="fas fa-trash"></i>')
-            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
-          ->attributes(['onclick' => "confirmDelete({$row->id})"]),
+            Button::add('delete')
+                ->slot('<i class="fas fa-trash"></i>')
+                ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+                ->attributes(['onclick' => "confirmDelete({$row->id})"]),
         ];
     }
 }
-
-  

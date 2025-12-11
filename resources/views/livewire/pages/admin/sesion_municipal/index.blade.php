@@ -2,13 +2,16 @@
 
 use Livewire\Volt\Component;
 use App\Models\SesionMunicipal;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
+use Carbon\Carbon;
 
 new class extends Component {
     
     public function deleteSesionMunicipal(SesionMunicipal $sesion_municipal)
     {
         try {
-            // Eliminar el registro de la base de datos
             $sesion_municipal->delete();
 
             $this->dispatch('showAlert', [
@@ -19,7 +22,6 @@ new class extends Component {
                 'timerProgressBar' => 'true',
             ]);
 
-            // Refrescar la tabla
             $this->dispatch('pg:eventRefresh-sesion-municipal-table');
 
         } catch (\Exception $e) {
@@ -29,6 +31,65 @@ new class extends Component {
                 'text' => 'Ocurrió un error al eliminar la sesión municipal: ' . $e->getMessage(),
                 'timer' => '2000',
                 'timerProgressBar' => 'true',
+            ]);
+        }
+    }
+
+    public function generatePdf(SesionMunicipal $sesion)
+    {
+        try {
+            $logoPath = Setting::get('logo_horizontal');
+            $logoIcon = null;
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $imageContent = Storage::disk('public')->get($logoPath);
+                $mimeType = Storage::disk('public')->mimeType($logoPath);
+                $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }
+
+            $primaryColor = Setting::get('primary_color', '#0f2440');
+            $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+            $fields = [
+                ['label' => 'ID Sesión', 'value' => $sesion->id],
+                ['label' => 'Título', 'value' => $sesion->titulo],
+                ['label' => 'Categoría', 'value' => $sesion->categoria?->nombre ?? 'Sin categoría'],
+                ['label' => 'Descripción', 'value' => $sesion->descripcion],
+                ['label' => 'Fecha y Hora', 'value' => Carbon::parse($sesion->fecha_hora)->timezone('America/Caracas')->format('d/m/Y h:i A')],
+                ['label' => 'Estado', 'value' => ucfirst($sesion->estado), 'highlight' => true],
+                ['label' => 'Generado', 'value' => now()->format('d/m/Y H:i')],
+            ];
+
+            $html = view('livewire.pages.admin.pdf.pdf-layout', [
+                'fields' => $fields,
+                'title' => 'Sesión Municipal',
+                'subtitle' => $sesion->titulo,
+                'logo_icon' => $logoIcon,
+                'primaryColor' => $primaryColor,
+                'secondaryColor' => $secondaryColor,
+                'tags' => ['Sesión Municipal', ucfirst($sesion->estado), $sesion->categoria?->nombre],
+                'badgeTitle' => 'Información de Sesión',
+                'sectionTitle' => 'Detalles de la Sesión',
+            ])->render();
+
+            $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+            $pdf = Pdf::loadHTML($html)
+                ->setPaper('a4')
+                ->setOption('encoding', 'UTF-8')
+                ->setOption('default_font', 'DejaVu Sans');
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, "sesion_municipal_" . $sesion->id . "_" . now()->format('d-m-Y_H-i') . ".pdf", [
+                'Content-Type' => 'application/pdf',
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en generatePdf: ' . $e->getMessage());
+            $this->dispatch('showAlert', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Error al generar PDF: ' . $e->getMessage(),
             ]);
         }
     }

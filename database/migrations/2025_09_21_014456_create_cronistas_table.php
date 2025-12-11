@@ -28,9 +28,7 @@ return new class extends Migration
             $table->foreignId('municipio_id')->nullable()->constrained('municipios')->onDelete('set null');
             $table->foreignId('parroquia_id')->constrained('parroquias')->onDelete('cascade');
 
-            // Relación con categoria_cronistas
-            //  $table->foreignId('categoria_id')->nullable()->constrained('categoria_cronistas')->onDelete('set null');
-
+      
             $table->timestamps();
         });
     }

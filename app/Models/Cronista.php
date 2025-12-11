@@ -43,12 +43,6 @@ class Cronista extends Model
         }
     }
 
-    // Relación con categoría
-    public function categoria()
-    {
-        return $this->belongsTo(CategoriaCronista::class, 'categoria_id');
-    }
-
     // Relación con estado, municipio y parroquia
     public function estado()
     {

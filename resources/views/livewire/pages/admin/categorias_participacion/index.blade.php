@@ -2,13 +2,16 @@
 
 use Livewire\Volt\Component;
 use App\Models\CategoriaParticipacion;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
+use Carbon\Carbon;
 
 new class extends Component {
     
     public function deleteCategoriaParticipacion(CategoriaParticipacion $categorias_participacion)
     {
         try {
-            // Eliminar el registro de la base de datos
             $categorias_participacion->delete();
 
             $this->dispatch('showAlert', [
@@ -19,7 +22,6 @@ new class extends Component {
                 'timerProgressBar' => 'true',
             ]);
 
-            // Refrescar la tabla
             $this->dispatch('pg:eventRefresh-categoria-participacion-table');
 
         } catch (\Exception $e) {
@@ -29,6 +31,62 @@ new class extends Component {
                 'text' => 'Ocurrió un error al eliminar la categoría: ' . $e->getMessage(),
                 'timer' => '2000',
                 'timerProgressBar' => 'true',
+            ]);
+        }
+    }
+
+    public function generatePdf(CategoriaParticipacion $categoria)
+    {
+        try {
+            $logoPath = Setting::get('logo_horizontal');
+            $logoIcon = null;
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $imageContent = Storage::disk('public')->get($logoPath);
+                $mimeType = Storage::disk('public')->mimeType($logoPath);
+                $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }
+
+            $primaryColor = Setting::get('primary_color', '#0f2440');
+            $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+            $fields = [
+                ['label' => 'ID', 'value' => $categoria->id],
+                ['label' => 'Nombre', 'value' => $categoria->nombre],
+                ['label' => 'Descripción', 'value' => $categoria->descripcion ?? 'N/A'],
+                ['label' => 'Creado', 'value' => Carbon::parse($categoria->created_at)->timezone('America/Caracas')->format('d/m/Y H:i')],
+            ];
+
+            $html = view('livewire.pages.admin.pdf.pdf-layout', [
+                'fields' => $fields,
+                'title' => $categoria->nombre,
+                'subtitle' => 'Categoría de Participación',
+                'logo_icon' => $logoIcon,
+                'primaryColor' => $primaryColor,
+                'secondaryColor' => $secondaryColor,
+                'tags' => ['Categoría de Participación'],
+                'badgeTitle' => 'Clasificación',
+                'sectionTitle' => 'Datos de la Categoría'
+            ])->render();
+
+            $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+            $pdf = Pdf::loadHTML($html)
+                ->setPaper('a4')
+                ->setOption('encoding', 'UTF-8')
+                ->setOption('default_font', 'DejaVu Sans');
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, "categoria_participacion_" . $categoria->id . "_" . now()->format('d-m-Y_H-i') . ".pdf", [
+                'Content-Type' => 'application/pdf',
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en generatePdf: ' . $e->getMessage());
+            $this->dispatch('showAlert', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Error al generar PDF: ' . $e->getMessage(),
             ]);
         }
     }

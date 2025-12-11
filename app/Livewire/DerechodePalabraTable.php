@@ -37,7 +37,7 @@ final class DerechodePalabraTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return DerechoDePalabra::query()->with(['sesion']);
+        return DerechoDePalabra::query()->with(['sesion', 'comision']);
     }
 
     public function relationSearch(): array
@@ -54,7 +54,9 @@ final class DerechodePalabraTable extends PowerGridComponent
             ->add('apellido')
             ->add('email')
             ->add('telefono_movil')
+            ->add('whatsapp')
             ->add('sesion_municipal_id')
+            ->add('comision_id')
             ->add('motivo_solicitud')
             ->add('estado')
             ->add('observaciones')
@@ -62,6 +64,7 @@ final class DerechodePalabraTable extends PowerGridComponent
             ->add('created_at')
             ->add('sesion_titulo', fn($row) => $row->sesion?->titulo ?? 'Sin sesión')
             ->add('categoria_nombre', fn($row) => $row->sesion?->categoria?->nombre ?? 'Sin categoría')
+            ->add('comision_nombre', fn($row) => $row->comision?->nombre ?? 'Sin comisión')
             ->add('fecha_solicitud_formatted', fn($row) =>
                 Carbon::parse($row->created_at)
                     ->timezone('America/Caracas')
@@ -128,6 +131,11 @@ final class DerechodePalabraTable extends PowerGridComponent
                 ->searchable()
                 ->bodyAttribute('truncate max-w-sm'),
 
+            Column::make('Comisión', 'comision_nombre')
+                ->sortable()
+                ->searchable()
+                ->bodyAttribute('truncate max-w-sm'),
+
             Column::make('Motivo', 'motivo_solicitud')
                 ->sortable()
                 ->searchable()
@@ -161,27 +169,38 @@ final class DerechodePalabraTable extends PowerGridComponent
             Filter::inputText('email')->operators(['contains']),
             Filter::inputText('telefono_movil')->operators(['contains']),
             Filter::inputText('whatsapp')->operators(['contains']),
+            Filter::inputText('comision_nombre')->operators(['contains']),
         ];
     }
 
-    public function actions(DerechoDePalabra $row): array
-    {
-        return [
-       Button::add('confirmar')
-    ->slot('<i class="fas fa-handshake"></i>')
-    ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
-    ->attributes([
-        'wire:click' => '$dispatch(\'abrir-confirmar-modal\', { id: ' . $row->id . ' })',
-        'title' => 'Confirmar solicitud'
-    ]),
+  public function actions(DerechoDePalabra $row): array
+{
+    return [
+        Button::add('pdf')
+            ->slot('<i class="fas fa-file-pdf"></i>')
+            ->class('bg-blue-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-blue-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'wire:click' => "\$parent.call('generatePdf', {$row->id})",
+                'title' => 'Descargar PDF',
+                'style' => 'cursor: pointer;'
+            ]),
 
-Button::add('delete')
-    ->slot('<i class="fas fa-trash"></i>')
-    ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
-    ->attributes([
-        'onclick' => "confirmDeleteDerechoPalabra({$row->id})",
-        'title' => 'Eliminar solicitud'
-    ]),
-        ];
-    }
+        Button::add('confirmar')
+            ->slot('<i class="fas fa-handshake"></i>')
+            ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'wire:click' => '$dispatch(\'abrir-confirmar-modal\', { id: ' . $row->id . ' })',
+                'title' => 'Confirmar solicitud'
+            ]),
+
+        Button::add('delete')
+            ->slot('<i class="fas fa-trash"></i>')
+            ->class('bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-red-700 shadow-sm text-xs sm:text-sm transition-all duration-300 hover:scale-105')
+            ->attributes([
+                'onclick' => "confirmDeleteDerechoPalabra({$row->id})",
+                'title' => 'Eliminar solicitud'
+            ]),
+    ];
 }
+}
+?>

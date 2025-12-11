@@ -30,18 +30,23 @@ return new class extends Migration
             $table->timestamps();
         });
      
-        Schema::create('derecho_palabra', function (Blueprint $table) {
+   Schema::create('derecho_palabra', function (Blueprint $table) {
             $table->id();
             $table->string('cedula')->unique();
             $table->string('nombre'); 
             $table->string('apellido');
             $table->string('email')->unique();
             $table->string('telefono_movil'); 
-            $table->string('whatsapp');         
-            $table->foreignId('sesion_municipal_id')
+            $table->string('whatsapp'); 
+                $table->foreignId('sesion_municipal_id')
                 ->nullable()
                 ->constrained('sesions_municipal')
                 ->onDelete('set null');
+            $table->foreignId('comision_id')
+                ->nullable()
+                ->constrained('comisions') 
+                ->onDelete('set null');
+            
             $table->text('motivo_solicitud'); 
             $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente');
             $table->text('observaciones')->nullable();

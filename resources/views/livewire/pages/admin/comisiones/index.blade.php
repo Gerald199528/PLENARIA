@@ -3,7 +3,9 @@
 use Livewire\Volt\Component;
 use App\Models\Comision;
 use Illuminate\Validation\ValidationException;
-
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 new class extends Component
 {
     public $comisionId;
@@ -191,6 +193,66 @@ new class extends Component
             'timerProgressBar' => true,
         ]);
     }
+
+public function downloadComisionPdf($comisionId)
+{
+    try {
+        $comision = Comision::findOrFail($comisionId);
+
+        $logoPath = Setting::get('logo_horizontal');
+        $logoIcon = null;
+        if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+            $imageContent = Storage::disk('public')->get($logoPath);
+            $mimeType = Storage::disk('public')->mimeType($logoPath);
+            $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+        }
+
+        $primaryColor = Setting::get('primary_color', '#0f2440');
+        $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+        $fields = [
+            ['label' => 'Nombre', 'value' => $comision->nombre],
+            ['label' => 'Descripción', 'value' => $comision->descripcion ?? 'N/A'],
+            ['label' => 'Miembros', 'value' => DB::table('comision_concejal')->where('comision_id', $comisionId)->count()],
+            ['label' => 'Creado', 'value' => $comision->created_at->format('d/m/Y H:i')],
+        ];
+
+        $tags = ['Comisión'];
+
+        $html = view('livewire.pages.admin.pdf.pdf-layout', [
+            'fields' => $fields,
+            'title' => $comision->nombre,
+            'subtitle' => 'Información de la Comisión',
+            'logo_icon' => $logoIcon,
+            'primaryColor' => $primaryColor,
+            'secondaryColor' => $secondaryColor,
+            'tags' => $tags,
+            'sectionTitle' => 'Datos de la Comisión',
+            'badgeTitle' => 'Clasificación'
+        ])->render();
+
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setOption('encoding', 'UTF-8')
+            ->setOption('default_font', 'DejaVu Sans');
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, "comision_{$comision->id}.pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+
+    } catch (\Exception $e) {
+        $this->dispatch('showAlert', [
+            'icon' => 'error',
+            'title' => 'Error',
+            'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+        ]);
+    }
+}
+
 };
 
 ?>

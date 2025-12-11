@@ -27,7 +27,7 @@
 
             <!-- Botones mejorados -->
             <div class="flex gap-2 w-full sm:w-auto">
-                <button onclick="downloadLinePDF('lineChart')" class="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 text-xs sm:text-sm font-semibold flex-1 sm:flex-none flex items-center justify-center gap-2">
+                <button onclick="downloadLineChartPDF()" class="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 text-xs sm:text-sm font-semibold flex-1 sm:flex-none flex items-center justify-center gap-2">
                     <i class="fa-solid fa-file-pdf"></i> 
                     <span class="hidden sm:inline">PDF</span>
                 </button>
@@ -37,7 +37,6 @@
                 </button>
             </div>
         </div>
-
         <!-- Stats bar -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8">
             <div class="bg-white dark:bg-gray-700/50 rounded-xl p-3 border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-300">

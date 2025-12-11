@@ -139,6 +139,7 @@ new class extends Component {
 }; ?>
 
 
+
 <div>
     <x-slot name="breadcrumbs">
         <livewire:components.breadcrumb :breadcrumbs="[
@@ -151,14 +152,22 @@ new class extends Component {
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-8">Gestión de Logos de la Empresa</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Logo Principal -->
+
+            <!--Logo de la Empresa-->
             <div class="group relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fas fa-star text-yellow-500"></i>
-                        Eslogan de la empresa.
+                        Logo de la Empresa
                     </h3>
                     <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-xs font-semibold rounded-full">Principal</span>
+                </div>
+                
+                <div class="mb-3 p-3 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 rounded">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                        Carga aquí los logos de la institución (escudo, bandera, logotipo, etc.)
+                    </p>
                 </div>
                 
                 <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-blue-500 dark:group-hover:border-blue-400">
@@ -207,13 +216,20 @@ new class extends Component {
                 @endif
             </div>
 
-            <!-- Logo con Fondo Sólido -->
+            <!--Eslogan Web Principalo -->
             <div class="group relative bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fas fa-fill-drip text-purple-500"></i>
-                       Eslogan web principal
+                       Eslogan Web PrincipaL
                     </h3>
+                </div>
+                
+                <div class="mb-3 p-3 bg-purple-50 dark:bg-purple-900/30 border-l-4 border-purple-500 rounded">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-info-circle text-purple-500 mr-2"></i>
+                    Implantado en la trasparencia de la pagina web.
+                    </p>
                 </div>
                 
                 <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-purple-500 dark:group-hover:border-purple-400">
@@ -258,66 +274,79 @@ new class extends Component {
                     </div>
                 @endif
             </div>
-
-            <!-- Logo Escala de Grises -->
-            <div class="group relative bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-700 dark:to-slate-800 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
+                   
+            <!--   Icono principal  de la App-->
+            <div class="group relative bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-800/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fas fa-adjust text-gray-500 dark:text-gray-400"></i>
-                        Escala de Grises
+                        <i class="fas fa-icons text-pink-500"></i>
+                        Icono principal del "Sistema"
                     </h3>
                 </div>
                 
-                <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
-                    <div wire:loading wire:target="temp_logo_grey" class="absolute inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-20 backdrop-blur-sm">
+                <div class="mb-3 p-3 bg-pink-50 dark:bg-pink-900/30 border-l-4 border-pink-500 rounded">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-info-circle text-pink-500 mr-2"></i>
+                        Carga un icono o elemento que identifique a la institución
+                    </p>
+                </div>
+                
+                <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-pink-500 dark:group-hover:border-pink-400">
+                    <div wire:loading wire:target="temp_logo_icon" class="absolute inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-20 backdrop-blur-sm">
                         <div class="flex flex-col items-center gap-3">
                             <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span class="text-white font-semibold text-sm">Cargando...</span>
+                            <span class="text-white font-semibold text-sm">Procesando...</span>
                         </div>
                     </div>
 
                     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <label class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg cursor-pointer shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all duration-200">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg cursor-pointer shadow-lg hover:shadow-xl hover:from-pink-600 hover:to-pink-700 transform hover:scale-105 transition-all duration-200">
                             <i class="fas fa-camera"></i>
                             <span class="text-sm font-medium">Cambiar</span>
-                            <input type="file" wire:model="temp_logo_grey" class="hidden" accept="image/*">
+                            <input type="file" wire:model="temp_logo_icon" class="hidden" accept="image/*">
                         </label>
                     </div>
 
                     <div class="aspect-video flex items-center justify-center p-4">
-                        @if($temp_logo_grey)
-                            <img src="{{ $temp_logo_grey->temporaryUrl() }}"
-                                alt="Logo Escala de Grises (Vista Previa)"
-                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 grayscale">
+                        @if($temp_logo_icon)
+                            <img src="{{ $temp_logo_icon->temporaryUrl() }}"
+                                alt="Logo Icono (Vista Previa)"
+                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110">
                         @else
-                            <img src="{{ $logo_grey ? Storage::url($logo_grey) : Storage::url('images/placeholder.png') }}"
-                                alt="Logo Escala de Grises"
-                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 grayscale">
+                            <img src="{{ $logo_icon ? Storage::url($logo_icon) : Storage::url('images/placeholder.png') }}"
+                                alt="Logo Icono"
+                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110">
                         @endif
                     </div>
                 </div>
 
-                @if($temp_logo_grey)
+              @if($temp_logo_icon)
                     <div class="mt-4 flex gap-2 animate-fadeIn">
-                        <button wire:click="saveLogo('logo_grey')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
+                        <button wire:click="saveLogo('logo_icon')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-pink-500 dark:bg-pink-600 text-white rounded-lg hover:bg-pink-600 dark:hover:bg-pink-700 transition-colors duration-200 font-medium">
                             <i class="fas fa-check"></i>
                             <span wire:loading.remove wire:target="saveLogo">Guardar</span>
                             <span wire:loading wire:target="saveLogo">Guardando...</span>
                         </button>
-                        <button wire:click="$set('temp_logo_grey', null)" class="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200">
+                        <button wire:click="$set('temp_logo_icon', null)" class="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 @endif
             </div>
 
-            <!-- Logo Horizontal -->
+             <!-- Logo Horizontal (Formato PDF) -->             
             <div class="group relative bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fas fa-arrows-alt-h text-green-500"></i>
-                        Logo Horizontal
+                        Logo Horizontal "Formato PDF"
                     </h3>
+                </div>
+                   <div class="mb-3 p-3 bg-blue-50 dark:bg-green-900/30 border-l-4 border-green-500 rounded">
+                    <p class="text-sm text-green-700 dark:text-green-300">
+                        <i class="fas fa-info-circle text-green-500 mr-2"></i>
+                        Este logo es para el formato de los PDF impelemntado en el sistema
+                    </p>
                 </div>
                 
                 <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-green-500 dark:group-hover:border-green-400">
@@ -363,13 +392,19 @@ new class extends Component {
                 @endif
             </div>
 
-            <!-- Logo Horizontal con Fondo Sólido -->
+            <!-- L Logo Plenaria  -->
             <div class="group relative bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-800/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fas fa-palette text-orange-500"></i>
-                        Horizontal + Fondo
+                       Logo  Plenaria "login, Dashboard" 
                     </h3>
+                </div>
+                    <div class="mb-3 p-3 bg-blue-50 dark:bg-orange-900/30 border-l-4 border-orange-500 rounded">
+                    <p class="text-sm text-orange-700 dark:text-orange-300">
+                        <i class="fas fa-info-circle text-orange-500 mr-2"></i>
+                       Logo principal "PLENARIA" Implantado en (Login, Dashboard)
+                    </p>
                 </div>
                 
                 <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-orange-500 dark:group-hover:border-orange-400">
@@ -415,56 +450,57 @@ new class extends Component {
                 @endif
             </div>
 
-            <!-- Logo Icono -->
-            <div class="group relative bg-gradient-to-br from-pink-50 to-rose-100 dark:from-pink-900/30 dark:to-rose-800/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
+             <!--Escala de Grises -->
+            <div class="group relative bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-700 dark:to-slate-800 rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fas fa-icons text-pink-500"></i>
-                        Logo Icono
+                        <i class="fas fa-adjust text-gray-500 dark:text-gray-400"></i>
+                        Escala de Grises
                     </h3>
                 </div>
                 
-                <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-pink-500 dark:group-hover:border-pink-400">
-                    <div wire:loading wire:target="temp_logo_icon" class="absolute inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-20 backdrop-blur-sm">
+                <div class="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 transition-all duration-300 group-hover:border-gray-500 dark:group-hover:border-gray-400">
+                    <div wire:loading wire:target="temp_logo_grey" class="absolute inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-20 backdrop-blur-sm">
                         <div class="flex flex-col items-center gap-3">
                             <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span class="text-white font-semibold text-sm">Procesando...</span>
+                            <span class="text-white font-semibold text-sm">Cargando...</span>
                         </div>
                     </div>
 
                     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <label class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg cursor-pointer shadow-lg hover:shadow-xl hover:from-pink-600 hover:to-pink-700 transform hover:scale-105 transition-all duration-200">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-lg cursor-pointer shadow-lg hover:shadow-xl hover:from-gray-600 hover:to-gray-700 transform hover:scale-105 transition-all duration-200">
                             <i class="fas fa-camera"></i>
                             <span class="text-sm font-medium">Cambiar</span>
-                            <input type="file" wire:model="temp_logo_icon" class="hidden" accept="image/*">
+                            <input type="file" wire:model="temp_logo_grey" class="hidden" accept="image/*">
                         </label>
                     </div>
 
                     <div class="aspect-video flex items-center justify-center p-4">
-                        @if($temp_logo_icon)
-                            <img src="{{ $temp_logo_icon->temporaryUrl() }}"
-                                alt="Logo Icono (Vista Previa)"
-                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110">
+                        @if($temp_logo_grey)
+                            <img src="{{ $temp_logo_grey->temporaryUrl() }}"
+                                alt="Logo Escala de Grises (Vista Previa)"
+                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 grayscale">
                         @else
-                            <img src="{{ $logo_icon ? Storage::url($logo_icon) : Storage::url('images/placeholder.png') }}"
-                                alt="Logo Icono"
-                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110">
+                            <img src="{{ $logo_grey ? Storage::url($logo_grey) : Storage::url('images/placeholder.png') }}"
+                                alt="Logo Escala de Grises"
+                                class="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110 grayscale">
                         @endif
                     </div>
                 </div>
-
-                @if($temp_logo_icon)
+                     @if($temp_logo_grey)
                     <div class="mt-4 flex gap-2 animate-fadeIn">
-                        <button wire:click="saveLogo('logo_icon')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-pink-500 dark:bg-pink-600 text-white rounded-lg hover:bg-pink-600 dark:hover:bg-pink-700 transition-colors duration-200 font-medium">
+                        <button wire:click="saveLogo('logo_grey')" class="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 dark:bg-gray-600 text-white rounded-lg hover:bg-gray-600 dark:hover:bg-gray-700 transition-colors duration-200 font-medium">
                             <i class="fas fa-check"></i>
                             <span wire:loading.remove wire:target="saveLogo">Guardar</span>
                             <span wire:loading wire:target="saveLogo">Guardando...</span>
                         </button>
-                        <button wire:click="$set('temp_logo_icon', null)" class="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200">
+                        <button wire:click="$set('temp_logo_grey', null)" class="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded-lg hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 @endif
+
+          
             </div>
 
             <!-- Logo Icono Gris -->

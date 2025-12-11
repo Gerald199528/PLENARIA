@@ -26,7 +26,7 @@
             </div>
 <!-- Botones mejorados - Azul -->
             <div class="flex gap-2 w-full sm:w-auto">
-                <button onclick="downloadPDF('doughnutChart')" class="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 text-xs sm:text-sm font-semibold flex-1 sm:flex-none flex items-center justify-center gap-2">
+                <button onclick="downloadDoughnutPDF()" class="group/btn bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 text-xs sm:text-sm font-semibold flex-1 sm:flex-none flex items-center justify-center gap-2">
                     <i class="fa-solid fa-file-pdf"></i> 
                     <span class="hidden sm:inline">PDF</span>
                 </button>
@@ -62,12 +62,29 @@
             <canvas id="doughnutChart" class="max-w-full"></canvas>
         </div>
 
-        <!-- Legend personalizada - Mejorada -->
-        <div class="mt-8 sm:mt-10">
+        <!-- Legend personalizada - Con "Ver más" -->
+        <div id="legendSection" class="mt-8 sm:mt-10">
             <h3 class="text-lg sm:text-xl font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-list text-purple-500"></i> Detalle por Comisión
             </h3>
             <div id="legendContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <button id="verMasBtn" onclick="toggleVerMas()" class="group/btn mt-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg shadow-lg hover:shadow-2xl hover:scale-110 transition-all duration-300 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 mx-auto">
+                <i class="fa-solid fa-chevron-down" id="chevronIcon" style="transition: transform 0.3s ease;"></i>
+                <span id="verMasText">Ver más comisiones</span>
+            </button>
+        </div>
+
+        <!-- Mensaje sin datos -->
+        <div id="noDataSection" class="mt-8 sm:mt-10 hidden">
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-700/50 dark:to-gray-600/50 border-2 border-amber-200 dark:border-amber-700/50 rounded-2xl p-6 sm:p-8 flex items-center gap-4">
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-inbox text-4xl text-amber-500"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold text-amber-900 dark:text-amber-100">Sin datos registrados</h3>
+                    <p class="text-sm sm:text-base text-amber-700 dark:text-amber-200 mt-1">No hay comisiones con concejales asignados en este momento.</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -76,32 +93,29 @@
 
 <script>
 window.doughnutChartInstance = null;
+window.mostrandoTodos = false;
+window.totalComisiones = 0;
 
 function downloadPNG(chartId){ 
     const chartCanvas = document.getElementById(chartId);
     if(!chartCanvas) return;
 
-    // Crear canvas temporal para combinar gráfica + estadísticas
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = 1200;
     tempCanvas.height = 900;
     const ctx = tempCanvas.getContext('2d');
 
-    // Fondo blanco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-    // Título
     ctx.fillStyle = '#1f2937';
     ctx.font = 'bold 36px Arial';
     ctx.fillText('Reporte - Distribución por Comisiones', 40, 50);
 
-    // Subtítulo
     ctx.fillStyle = '#6b7280';
     ctx.font = '16px Arial';
     ctx.fillText('Concejales Activos Registrados por Comisión', 40, 80);
 
-    // Línea separadora
     ctx.strokeStyle = '#e5e7eb';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -109,7 +123,6 @@ function downloadPNG(chartId){
     ctx.lineTo(1160, 95);
     ctx.stroke();
 
-    // Estadísticas
     const total = document.getElementById('totalConcejales').textContent;
     const comisiones = document.getElementById('totalComisiones').textContent;
     const mayor = document.getElementById('mayorCantidad').textContent;
@@ -125,16 +138,13 @@ function downloadPNG(chartId){
     let xPos = 40;
     const statHeight = 60;
     stats.forEach((stat, idx) => {
-        // Caja de estadística
         ctx.fillStyle = stat.color + '15';
         ctx.fillRect(xPos, 120, 260, statHeight);
         
-        // Borde
         ctx.strokeStyle = stat.color;
         ctx.lineWidth = 2;
         ctx.strokeRect(xPos, 120, 260, statHeight);
 
-        // Texto
         ctx.fillStyle = '#6b7280';
         ctx.font = '12px Arial';
         ctx.fillText(stat.label, xPos + 15, 140);
@@ -146,18 +156,15 @@ function downloadPNG(chartId){
         xPos += 280;
     });
 
-    // Gráfica
     const originalImage = chartCanvas.toDataURL('image/png');
     const img = new Image();
     img.onload = function() {
         ctx.drawImage(img, 50, 220, 1100, 550);
 
-        // Fecha
         ctx.fillStyle = '#9ca3af';
         ctx.font = '12px Arial';
         ctx.fillText('Generado: ' + new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES'), 40, 880);
 
-        // Descargar
         tempCanvas.toBlob(blob => {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -170,26 +177,49 @@ function downloadPNG(chartId){
     img.src = originalImage;
 }
 
-function actualizarEstadisticas(datos) {
-    const total = datos.reduce((a, b) => a + b, 0);
-    const mayor = Math.max(...datos);
-    const promedio = (total / datos.length).toFixed(1);
-    const comisiones = datos.length;
+function actualizarEstadisticas(datos, labels) {
+    // Validar si son datos reales o placeholders
+    const sonDatosReales = labels && labels.length > 0 && 
+                          !(labels.length === 1 && (labels[0] === 'Sin datos' || labels[0] === 'Sin datos disponibles'));
+    
+    if (!sonDatosReales || !datos || datos.length === 0) {
+        // Si no hay datos reales, mostrar ceros
+        document.getElementById('totalConcejales').textContent = '0';
+        document.getElementById('totalComisiones').textContent = '0';
+        document.getElementById('mayorCantidad').textContent = '0';
+        document.getElementById('promedioCantidad').textContent = '0';
+    } else {
+        // Si hay datos reales, calcular correctamente
+        const total = datos.reduce((a, b) => a + b, 0);
+        const mayor = Math.max(...datos);
+        const promedio = (total / datos.length).toFixed(1);
+        const comisiones = datos.length;
 
-    document.getElementById('totalConcejales').textContent = total;
-    document.getElementById('totalComisiones').textContent = comisiones;
-    document.getElementById('mayorCantidad').textContent = mayor;
-    document.getElementById('promedioCantidad').textContent = promedio;
+        document.getElementById('totalConcejales').textContent = total;
+        document.getElementById('totalComisiones').textContent = comisiones;
+        document.getElementById('mayorCantidad').textContent = mayor;
+        document.getElementById('promedioCantidad').textContent = promedio;
+    }
 }
 
 function generarLegendPersonalizada(labels, datos, colores) {
     const container = document.getElementById('legendContainer');
     container.innerHTML = '';
+    
+    window.totalComisiones = labels.length;
+    window.mostrandoTodos = false;
 
     labels.forEach((label, index) => {
         const item = document.createElement('div');
-        item.className = 'bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700/50 dark:to-gray-600/50 p-4 rounded-xl border-2 hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-300 cursor-pointer group/item hover:shadow-lg transform hover:scale-105';
+        item.className = 'bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-700/50 dark:to-gray-600/50 p-4 rounded-xl border-2 hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-300 cursor-pointer group/item hover:shadow-lg transform hover:scale-105 legend-item';
         item.style.borderColor = colores[index].replace('0.8', '0.5');
+        item.setAttribute('data-index', index);
+        
+        // Ocultar items después del 3ro si hay más de 3
+        if (labels.length > 3 && index >= 3) {
+            item.style.display = 'none';
+            item.classList.add('hidden-item');
+        }
         
         item.innerHTML = `
             <div class="flex items-start gap-4">
@@ -208,11 +238,63 @@ function generarLegendPersonalizada(labels, datos, colores) {
         `;
         container.appendChild(item);
     });
+    
+    // Mostrar/ocultar botón "Ver más"
+    const verMasBtn = document.getElementById('verMasBtn');
+    if (labels.length > 3) {
+        verMasBtn.style.display = 'flex';
+    } else {
+        verMasBtn.style.display = 'none';
+    }
+}
+
+function toggleVerMas() {
+    window.mostrandoTodos = !window.mostrandoTodos;
+    const items = document.querySelectorAll('.legend-item.hidden-item');
+    const btn = document.getElementById('verMasBtn');
+    const text = document.getElementById('verMasText');
+    const chevron = document.getElementById('chevronIcon');
+    
+    items.forEach(item => {
+        item.style.display = window.mostrandoTodos ? 'block' : 'none';
+    });
+    
+    if (window.mostrandoTodos) {
+        text.textContent = 'Ver menos comisiones';
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        text.textContent = 'Ver más comisiones';
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+function mostrarOcultarSecciones(labels) {
+    const legendSection = document.getElementById('legendSection');
+    const noDataSection = document.getElementById('noDataSection');
+    const statsBar = document.querySelector('.grid.grid-cols-2');
+    const chartContainer = document.querySelector('.w-full.h-72');
+
+    if (labels && labels.length > 0) {
+        // Mostrar todo si hay datos
+        statsBar.classList.remove('hidden');
+        chartContainer.classList.remove('hidden');
+        legendSection.classList.remove('hidden');
+        noDataSection.classList.add('hidden');
+    } else {
+        // Ocultar todo si no hay datos
+        statsBar.classList.add('hidden');
+        chartContainer.classList.add('hidden');
+        legendSection.classList.add('hidden');
+        noDataSection.classList.remove('hidden');
+    }
 }
 
 function initDoughnutChart(labels = [], datos = [], colores = []) {
     const doughnutCtx = document.getElementById('doughnutChart');
     if (!doughnutCtx) return;
+
+    // Mostrar u ocultar secciones
+    mostrarOcultarSecciones(labels);
 
     if (window.doughnutChartInstance) {
         window.doughnutChartInstance.destroy();  
@@ -224,7 +306,6 @@ function initDoughnutChart(labels = [], datos = [], colores = []) {
     const valores = datos && datos.length > 0 ? datos : [1];
     const coloresGrafica = colores && colores.length > 0 ? colores : ['rgba(229, 231, 235, 0.8)'];
 
-    // Detectar tamaño de pantalla
     const isMobile = window.innerWidth < 768;
     const fontSize = isMobile ? 10 : 13;
 
@@ -285,7 +366,7 @@ function initDoughnutChart(labels = [], datos = [], colores = []) {
     });
 
     // Actualizar estadísticas y leyenda
-    actualizarEstadisticas(valores);
+    actualizarEstadisticas(valores, etiquetas);
     generarLegendPersonalizada(etiquetas, valores, coloresGrafica);
 }
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4602d848aa2a3f0a48c80c558c14a6dd",
+    "content-hash": "63f49768256fedac3d2b1a872b4f30d3",
     "packages": [
         {
             "name": "archtechx/enums",
@@ -629,6 +629,80 @@
             "time": "2024-09-19T14:15:21+00:00"
         },
         {
+            "name": "devrabiul/laravel-pwa-kit",
+            "version": "v1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/devrabiul/laravel-pwa-kit.git",
+                "reference": "35937601e6d4fe4eeeb0bb94b29c6819898095ea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/devrabiul/laravel-pwa-kit/zipball/35937601e6d4fe4eeeb0bb94b29c6819898095ea",
+                "reference": "35937601e6d4fe4eeeb0bb94b29c6819898095ea",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "PwaKit": "Devrabiul\\PwaKit\\Facades\\PwaKit"
+                    },
+                    "providers": [
+                        "Devrabiul\\PwaKit\\PwaKitServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Devrabiul\\PwaKit\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Muhammad Rabiul",
+                    "email": "devrabiul@gmail.com",
+                    "homepage": "https://rixetbd.com",
+                    "role": "Software Engineer"
+                }
+            ],
+            "description": "Laravel PWA Kit is a lightweight and flexible package to add Progressive Web App (PWA) support to your Laravel applications with ease.",
+            "homepage": "https://github.com/devrabiul/laravel-pwa-kit",
+            "keywords": [
+                "laravel",
+                "laravel-pwa",
+                "manifest",
+                "offline",
+                "progressive-web-app",
+                "pwa",
+                "pwa-kit",
+                "service-worker",
+                "web-app"
+            ],
+            "support": {
+                "issues": "https://github.com/devrabiul/laravel-pwa-kit/issues",
+                "source": "https://github.com/devrabiul/laravel-pwa-kit/tree/v1.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/devrabiul",
+                    "type": "github"
+                },
+                {
+                    "url": "https://ko-fi.com/devrabiul",
+                    "type": "ko_fi"
+                }
+            ],
+            "time": "2025-09-11T19:13:23+00:00"
+        },
+        {
             "name": "dflydev/dot-access-data",
             "version": "v3.0.3",
             "source": {
@@ -873,16 +947,16 @@
         },
         {
             "name": "dompdf/dompdf",
-            "version": "v3.1.0",
+            "version": "v3.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a"
+                "reference": "db712c90c5b9868df3600e64e68da62e78a34623"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/a51bd7a063a65499446919286fb18b518177155a",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/db712c90c5b9868df3600e64e68da62e78a34623",
+                "reference": "db712c90c5b9868df3600e64e68da62e78a34623",
                 "shasum": ""
             },
             "require": {
@@ -931,9 +1005,9 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v3.1.0"
+                "source": "https://github.com/dompdf/dompdf/tree/v3.1.4"
             },
-            "time": "2025-01-15T14:09:04+00:00"
+            "time": "2025-10-29T12:43:30+00:00"
         },
         {
             "name": "dompdf/php-font-lib",
@@ -4497,16 +4571,16 @@
         },
         {
             "name": "masterminds/html5",
-            "version": "2.9.0",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Masterminds/html5-php.git",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6"
+                "reference": "fcf91eb64359852f00d921887b219479b4f21251"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
-                "reference": "f5ac2c0b0a2eefca70b2ce32a5809992227e75a6",
+                "url": "https://api.github.com/repos/Masterminds/html5-php/zipball/fcf91eb64359852f00d921887b219479b4f21251",
+                "reference": "fcf91eb64359852f00d921887b219479b4f21251",
                 "shasum": ""
             },
             "require": {
@@ -4558,9 +4632,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Masterminds/html5-php/issues",
-                "source": "https://github.com/Masterminds/html5-php/tree/2.9.0"
+                "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
-            "time": "2024-03-31T07:05:07+00:00"
+            "time": "2025-07-25T09:04:22+00:00"
         },
         {
             "name": "monolog/monolog",

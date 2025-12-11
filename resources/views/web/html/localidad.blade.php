@@ -1,14 +1,19 @@
 <!-- Leaflet CSS y JS -->
+<!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+
+<!-- Leaflet JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
-<!-- Leaflet Google Mutant (para tiles de Google) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-googlemutant/1.6.0/Leaflet.GoogleMutant.js"></script>
-
-<!-- Leaflet MarkerCluster -->
+<!-- Leaflet MarkerCluster CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/MarkerCluster.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/MarkerCluster.Default.min.css" />
+
+<!-- Leaflet MarkerCluster JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.1/leaflet.markercluster.js"></script>
+
+<!-- Alternativa: Usar Google Maps API directamente (sin GoogleMutant) -->
+<script src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY_AQUI"></script>
 
 <!-- Sección de Localidad -->
 <section id="localidad" class="py-8 md:py-16 lg:py-20 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">

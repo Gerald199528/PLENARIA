@@ -1,5 +1,5 @@
 <!-- Hero Section Mejorado -->
-<section id="inicio" class="relative min-h-screen sm:h-screen flex items-center justify-center overflow-hidden py-12 sm:py-0">
+<section id="inicio" class="relative min-h-0 flex items-center justify-center overflow-hidden py-24 sm:py-28">
     <!-- Background con parallax -->
     <div class="absolute inset-0 z-0">
         <div class="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-accent opacity-90"></div>
@@ -67,8 +67,7 @@
         </div>
     </div>
     
-    <!-- Indicador de scroll -->
-    <div class="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce hidden sm:block">
-        <i class="fas fa-chevron-down text-xl sm:text-2xl"></i>
-    </div>
+<div class="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce block">
+    <i class="fas fa-chevron-down text-xl sm:text-2xl"></i>
+</div>
 </section>

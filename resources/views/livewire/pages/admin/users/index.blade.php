@@ -4,6 +4,9 @@ use Livewire\Volt\Component;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 
 new class extends Component {
     
@@ -14,7 +17,6 @@ new class extends Component {
 
     public function deleteUser(User $user)
     {
-        // Validar si es el usuario autenticado
         if ($user->id === Auth::id()) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
@@ -24,7 +26,6 @@ new class extends Component {
             return;
         }
 
-        // Validar si es el usuario principal (ID 1)
         if ($user->id === 1) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
@@ -34,7 +35,6 @@ new class extends Component {
             return;
         }
 
-        // Validar si tiene el rol Super Admin
         if ($user->hasRole('Super Admin')) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
@@ -44,9 +44,7 @@ new class extends Component {
             return;
         }
 
-        // Si pasa todas las validaciones, proceder con la eliminación
         try {
-            // Remover roles antes de eliminar
             $user->roles()->detach();
             $user->delete();
 
@@ -56,7 +54,6 @@ new class extends Component {
                 'text' => 'El usuario se ha eliminado correctamente',
             ]);
 
-            // Recargar la tabla
             $this->dispatch('pg:eventRefresh-user-table-2zxsby-table');
         } catch (\Exception $e) {
             $this->dispatch('showAlert', [
@@ -66,7 +63,79 @@ new class extends Component {
             ]);
         }
     }
-}; ?>
+
+    public function downloadUserPdf($userId)
+    {
+        try {
+            $user = User::with('roles')->findOrFail($userId);
+
+            $logoPath = Setting::get('logo_horizontal');
+            $logoIcon = null;
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $imageContent = Storage::disk('public')->get($logoPath);
+                $mimeType = Storage::disk('public')->mimeType($logoPath);
+                $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }
+
+                        $image = null;
+                if ($user->image_url) {
+                    $path = storage_path('app/public/' . $user->image_url);
+                    if (file_exists($path)) {
+                        $imageContent = file_get_contents($path);
+                        $mimeType = mime_content_type($path);
+                        $image = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+                    }
+                }
+                $primaryColor = Setting::get('primary_color', '#0f2440');
+                $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+            $fields = [
+                ['label' => 'Nombre', 'value' => $user->name],
+                ['label' => 'Apellido', 'value' => $user->last_name],
+                ['label' => 'Email', 'value' => $user->email],
+                ['label' => 'Documento', 'value' => $user->document ?? 'N/A'],
+                ['label' => 'Teléfono', 'value' => $user->phone ?? 'N/A'],
+                ['label' => 'Creado', 'value' => $user->created_at->format('d/m/Y H:i')],
+            ];
+
+            $tags = $user->roles->pluck('name')->toArray();
+
+            $html = view('livewire.pages.admin.pdf.pdf-layout', [
+                'fields' => $fields,
+                'title' => $user->name . ' ' . $user->last_name,
+                'subtitle' => 'Información de Usuario',
+                'logo_icon' => $logoIcon,
+                'image' => $image,
+                'primaryColor' => $primaryColor,
+                'secondaryColor' => $secondaryColor,
+                'tags' => $tags,
+                'badgeTitle' => 'Roles Asignados',
+                'sectionTitle' => 'Información Personal'
+            ])->render();
+
+            $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+            $pdf = Pdf::loadHTML($html)
+                ->setPaper('a4')
+                ->setOption('encoding', 'UTF-8')
+                ->setOption('default_font', 'DejaVu Sans');
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->stream();
+            }, "usuario_{$user->id}.pdf", [
+                'Content-Type' => 'application/pdf',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->dispatch('showAlert', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+            ]);
+        }
+    }
+};
+?>
 
 <div>
     <x-slot name="breadcrumbs">
@@ -80,24 +149,24 @@ new class extends Component {
             ],
         ]" />
     </x-slot>
-@can('create-user')
-    <x-slot name="action">
-        <div class="mt-2 sm:mt-3 md:mt-4">
-            <a 
-                href="{{ route('admin.users.create') }}" 
-                wire:navigate
-                class="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-lg sm:rounded-xl shadow-md sm:shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs sm:text-sm md:text-base"
-            >
-                <i class="fa-solid fa-plus animate-bounce text-xs sm:text-sm md:text-base flex-shrink-0"></i>
-                Nuevo Usuario
-            </a>
-        </div>
-    </x-slot>
-@endcan
+
+    @can('create-user')
+        <x-slot name="action">
+            <div class="mt-2 sm:mt-3 md:mt-4">
+                <a 
+                    href="{{ route('admin.users.create') }}" 
+                    wire:navigate
+                    class="inline-flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-lg sm:rounded-xl shadow-md sm:shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs sm:text-sm md:text-base"
+                >
+                    <i class="fa-solid fa-plus animate-bounce text-xs sm:text-sm md:text-base flex-shrink-0"></i>
+                    Nuevo Usuario
+                </a>
+            </div>
+        </x-slot>
+    @endcan
+
     <x-container class="w-full px-4">
-
         <livewire:user-table />
-
     </x-container>
 
     @push('scripts')

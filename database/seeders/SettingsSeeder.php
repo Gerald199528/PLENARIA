@@ -60,7 +60,7 @@ class SettingsSeeder extends Seeder
             ],
             [
                 'key' => 'logo_horizontal_background_solid',
-                'value' => 'images/5_logo_horizontal_background_solid.jpg',
+                'value' => 'images/5_logo_horizontal_background_solid.png',
                 'type' => 'string',
                 'group' => 'general',
                 'name' => 'Logo Horizontal Background Solid',

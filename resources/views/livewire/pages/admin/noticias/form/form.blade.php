@@ -343,6 +343,27 @@
 </div>
 @endif
 
+<div class="flex flex-col gap-3 sm:gap-4 justify-center items-center">
+    {{-- Mensaje informativo --}}
+    <div class="w-full p-3 sm:p-5 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg">
+        <p class="text-blue-700 dark:text-blue-200 text-xs sm:text-sm md:text-base font-medium flex items-start gap-2 sm:gap-3">
+            <i class="fa-solid fa-lightbulb w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Consejo:</strong> ¿No sabes cómo empezar? Usa nuestra IA para crear contenido profesional automáticamente. Solo describe lo que necesitas.</span>
+        </p>
+    </div>
+
+    {{-- Botón generar --}}
+    <button 
+        type="button"
+        x-on:click="$openModal('persistentModal')" 
+        class="inline-flex items-center justify-center gap-1 sm:gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base bg-gradient-to-r from-blue-600 to-indigo-500 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:from-blue-500 hover:to-indigo-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 w-full sm:w-auto">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span class="hidden sm:inline">Generar con IA</span>
+        <span class="sm:hidden">Generar IA</span>
+    </button>
+</div>
+
+@include('livewire.pages.admin.noticias.form.modal')
 {{-- Fila 7: Contenido --}}
 <div x-data="{ max: 5000, texto: @entangle('contenido') }" class="relative group">
     <label class="flex items-center gap-2 mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">

@@ -68,7 +68,7 @@
 <!-- Archivo PDF -->
 <div class="relative group">
     <label for="archivo_pdf" class="flex items-center gap-2 mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
-        <x-icon name="document" class="w-4 h-4 sm:w-5 sm:h-5" /> Archivo PDF (opcional)
+        <x-icon name="document" class="w-4 h-4 sm:w-5 sm:h-5" /> Archivo PDF (Requerido.)
     </label>
     <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-2 sm:gap-3">
         <div class="flex-1">

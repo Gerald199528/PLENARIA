@@ -18,8 +18,8 @@ class DerechoDePalabra extends Model
         'email',
         'telefono_movil',
         'whatsapp',
-        'categoria_participacion_id',
         'sesion_municipal_id',
+        'comision_id', 
         'motivo_solicitud',
         'estado',
         'observaciones',
@@ -34,13 +34,20 @@ class DerechoDePalabra extends Model
         'updated_at' => 'datetime',
     ];
 
-
     /**
      * Relación con SesionMunicipal
      */
     public function sesion()
     {
         return $this->belongsTo(SesionMunicipal::class, 'sesion_municipal_id');
+    }
+
+    /**
+     * Relación con Comisión
+     */
+    public function comision()
+    {
+        return $this->belongsTo(Comision::class, 'comision_id');
     }
 
     /**
@@ -67,3 +74,4 @@ class DerechoDePalabra extends Model
         return $query->where('estado', 'rechazada');
     }
 }
+?>

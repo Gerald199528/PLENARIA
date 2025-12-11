@@ -11,9 +11,8 @@ use App\Http\Controllers\ImageController;
 Route::middleware(['auth'])->group(function () {
 
  //Ruta de Dashboard
-Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
-
-        Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
+    Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
+    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
 
                 // Rutas para la gestión de usuarios
     Volt::route('/users', 'pages.admin.users.index')
@@ -316,22 +315,22 @@ Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
                 ->middleware('permission:view-noticias')
                 ->name('noticias.index');
 
-                 Volt::route('/noticias/create', 'pages.admin.noticias.create')
+                Volt::route('/noticias/create', 'pages.admin.noticias.create')
                 ->middleware('permission:create-noticias')
                 ->name('noticias.create');
 
 
-               Volt::route('/noticias/{noticia}/edit', 'pages.admin.noticias.edit')
+                Volt::route('/noticias/{noticia}/edit', 'pages.admin.noticias.edit')
                 ->middleware('permission:edit-noticias')          
                 ->name('noticias.edit'); 
                 
                      //categorias_participacion
 
-                 Volt::route('/categorias_participacion', 'pages.admin.categorias_participacion.index')
+                Volt::route('/categorias_participacion', 'pages.admin.categorias_participacion.index')
                 ->middleware('permission:view-categorias_participacion')
                 ->name('categorias_participacion.index'); 
 
-           Volt::route('/categorias_participacion/create', 'pages.admin.categorias_participacion.create')
+                Volt::route('/categorias_participacion/create', 'pages.admin.categorias_participacion.create')
             ->middleware('permission:create-categorias_participacion')
             ->name('categorias_participacion.create');
                 
@@ -356,7 +355,7 @@ Volt::route('/dashboard', 'pages.admin.dashboard.index')->name('dashboard');
 
                         //Derecho de palabra
 
-          Volt::route('/derecho_palabra', 'pages.admin.derecho_palabra.index')
+            Volt::route('/derecho_palabra', 'pages.admin.derecho_palabra.index')
             ->middleware('permission:view-derecho_palabra')
             ->name('derecho_palabra.index');
     });

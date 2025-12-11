@@ -2,8 +2,17 @@
 
 use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 
 new class extends Component {
+    public $logoIcon;
+    
+    public function mount()
+    {
+        $this->logoIcon = Setting::get('logo_icon');
+    }
+    
     public function logout(Logout $logout): void
     {
         $logout();
@@ -28,24 +37,28 @@ new class extends Component {
                 </button>
 
                 <!-- LOGO RESPONSIVE -->
-                <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center rounded shadow-md animate-bounce-slow bg-white/20">
-                        <i class="fas fa-landmark text-lg sm:text-2xl md:text-3xl text-white animate-bounce"></i>
-                    </div>
+          <a href="{{ route('home') }}" class="flex items-center gap-0 sm:gap-1.5 group flex-shrink-0">
+    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center overflow-hidden">
+        @if($logoIcon && Storage::disk('public')->exists($logoIcon))
+            <img 
+                src="{{ Storage::url($logoIcon) }}" 
+                alt="Logo" 
+                class="w-full h-full object-contain animate-bounce-ultra-slow"
+            >
+        @else
+            <i class="fas fa-landmark text-lg sm:text-2xl md:text-3xl text-white animate-bounce-ultra-slow"></i>
+        @endif
+    </div>
 
-                    <!-- TÍTULO -->
-                    <span class="hidden sm:block font-bold text-white text-sm sm:text-base md:text-lg lg:text-xl group-hover:underline transition-all duration-300">
-                        PLENARIA
-                    </span>
-                </a>
-
+    <!-- TÍTULO -->
+    <span class="hidden sm:block font-bold text-white text-sm sm:text-base md:text-lg lg:text-xl group-hover:underline transition-all duration-300">
+        LENARIA
+    </span>
+</a>
             </div>
-
             <!-- DERECHA -->
             <div class="flex items-center gap-1 sm:gap-2 md:gap-3 ml-auto flex-shrink-0">
-
                 <livewire:components.teme-switcher />
-
                 @if(Auth::check())
                 <x-dropdown>
                     <x-slot name="trigger">
@@ -72,51 +85,3 @@ new class extends Component {
     </div>
 </nav>
 
-@push('styles')
-<style>
-    /* Gradiente animado */
-    @keyframes gradientBackground {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    .animate-gradientBackground {
-        background-size: 200% 200%;
-        animation: gradientBackground 15s ease infinite;
-    }
-
-    /* Animación del icono */
-    @keyframes bounce-slow {
-        0%, 100% { transform: translateY(0); }
-        30% { transform: translateY(-5px); }
-    }
-    .animate-bounce-slow {
-        animation: bounce-slow 2s ease-in-out infinite;
-    }
-
-    /* Mobile optimizado */
-    @media (max-width: 640px) {
-        nav {
-            padding: 0.5rem 0.75rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        nav {
-            padding: 0.5rem 0.5rem;
-        }
-    }
-
-    /* Prevenir layout shift */
-    nav button, nav a {
-        will-change: transform;
-    }
-
-    /* Hover effects */
-    @media (hover: hover) {
-        button:hover {
-            transform: scale(1.05);
-        }
-    }
-</style>
-@endpush

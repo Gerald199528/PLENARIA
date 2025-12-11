@@ -37,6 +37,30 @@
                            cursor-not-allowed opacity-75">
             </div>
 
+            <!-- Comisión Input -->
+            <div class="relative group">
+                <label for="comision" class="flex items-center gap-2 mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">
+                    <i class="fa-solid fa-briefcase text-indigo-500"></i> Comisión Solicitada
+                </label>
+                <input 
+                    type="text" 
+                    id="comision" 
+                    wire:model="comision"
+                    readonly
+                    class="block w-full p-2 sm:p-4 text-sm sm:text-base text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-600
+                           border border-gray-300 dark:border-gray-600 rounded-2xl
+                           focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-300
+                           cursor-not-allowed opacity-75">
+                </input>
+                <!-- Mensaje si no hay comisión -->
+                @if(empty($comision))
+                    <div class="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 text-xs sm:text-sm font-medium">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <span>El ciudadano no solicitó comisión específica</span>
+                    </div>
+                @endif
+            </div>
+
             <!-- Estado Select -->
             <div class="relative group">
                 <label for="estado" class="flex items-center gap-2 mb-2 text-sm sm:text-base font-semibold text-gray-700 dark:text-gray-300">

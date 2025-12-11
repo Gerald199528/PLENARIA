@@ -8,7 +8,6 @@
                 Su voz importa. Participe activamente en la construcción de nuestro municipio
             </p>
         </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
             <!-- Formulario de Derecho de Palabra -->
             <div data-aos="fade-right">
@@ -17,10 +16,9 @@
                         <i class="fas fa-microphone text-red-500 text-lg sm:text-xl"></i>
                         <span>Derecho de Palabra</span>
                     </h3> 
-                    @include('web.page.participacion_ciudadana.form.form')
+                @include('web.page.participacion_ciudadana.form.form', compact('sesionesProximas', 'comisiones'))
                 </div>
             </div>
-
             <!-- Consultas Activas y Estadísticas -->
             <div data-aos="fade-left" data-aos-delay="200">
                 <div class="space-y-6 md:space-y-8">

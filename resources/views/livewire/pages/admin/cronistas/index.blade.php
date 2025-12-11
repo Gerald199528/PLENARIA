@@ -2,37 +2,30 @@
 
 use Livewire\Volt\Component;
 use App\Models\Cronista;
-
+use App\Models\CategoriaCronica;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
 
 new class extends Component {
-       
- public function deleteCronista($cronistaId)
+
+public function deleteCronista($cronistaId)
     {
         try {
-            $cronista= \App\Models\Cronista::findOrFail($cronistaId);
-            
-            // Eliminar imagen física si existe
+            $cronista= \App\Models\Cronista::findOrFail($cronistaId);       
             if ($cronista->imagen_url) {
-                $path = $cronista->imagen_url; // ejemplo: "cronista/imagen.jpg"
-    
+                $path = $cronista->imagen_url;    
                 if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
                 }
             }
-
-            // Eliminar el registro de la BD
-            $cronista->delete();
-
-            // Alerta de éxito
+            $cronista->delete();       
             $this->dispatch('showAlert', [
                 'icon' => 'success',
                 'title' => 'Eliminado',
                 'text' => 'El cronista y su imagen se eliminaron correctamente',
             ]);
-
-            // Refrescar la tabla automáticamente
             $this->dispatch('pg:eventRefresh-cronista-table');
-
         } catch (\Exception $e) {
             $this->dispatch('showAlert', [
                 'icon' => 'error',
@@ -41,8 +34,73 @@ new class extends Component {
             ]);
         }
     }
-}; ?>
+    public function downloadCronistaPdf($cronistaId)
+    {
+        try {
+            $cronista = Cronista::findOrFail($cronistaId);
 
+            $logoPath = Setting::get('logo_horizontal');
+            $logoIcon = null;
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $imageContent = Storage::disk('public')->get($logoPath);
+                $mimeType = Storage::disk('public')->mimeType($logoPath);
+                $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }       
+            $image = null;
+            if ($cronista->imagen_url) {
+                $path = storage_path('app/public/' . $cronista->imagen_url);
+                if (file_exists($path)) {
+                    $imageContent = file_get_contents($path);
+                    $mimeType = mime_content_type($path);
+                    $image = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+                }
+            }
+            $primaryColor = Setting::get('primary_color', '#0f2440');
+            $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+            $fields = [
+                ['label' => 'Cédula', 'value' => $cronista->cedula],
+                ['label' => 'Nombre', 'value' => $cronista->nombre_completo],
+                ['label' => 'Apellido', 'value' => $cronista->apellido_completo],
+                ['label' => 'Email', 'value' => $cronista->email],
+                ['label' => 'Teléfono', 'value' => $cronista->telefono ?? 'N/A'],
+                ['label' => 'Cargo', 'value' => $cronista->cargo ?? 'N/A'],
+                ['label' => 'Perfil', 'value' => $cronista->perfil ?? 'N/A'],
+                ['label' => 'Fecha Ingreso', 'value' => $cronista->fecha_ingreso ? \Carbon\Carbon::parse($cronista->fecha_ingreso)->format('d/m/Y') : 'N/A'],
+                ['label' => 'Creado', 'value' => $cronista->created_at->format('d/m/Y H:i')],
+            ];
+            $tags = ['Cronista'];
+            $html = view('livewire.pages.admin.pdf.pdf-layout', [
+                'fields' => $fields,
+                'title' => $cronista->nombre_completo . ' ' . $cronista->apellido_completo,
+                'subtitle' => 'Información del Cronista',
+                'logo_icon' => $logoIcon,
+                'image' => $image,
+                'primaryColor' => $primaryColor,
+                'secondaryColor' => $secondaryColor,
+                'tags' => $tags,
+                'badgeTitle' => 'Clasificación',
+                'sectionTitle' => 'Datos del Cronista'
+            ])->render();
+            $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+            $pdf = Pdf::loadHTML($html)
+                ->setPaper('a4')
+                ->setOption('encoding', 'UTF-8')
+                ->setOption('default_font', 'DejaVu Sans');
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->stream();
+            }, "cronista_{$cronista->id}.pdf", [
+                'Content-Type' => 'application/pdf',
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('showAlert', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Error al generar el PDF: ' . $e->getMessage(),
+            ]);
+        }
+    }
+};
+?>
 <div>
 
     <x-slot name="breadcrumbs">

@@ -6,6 +6,7 @@ use App\Models\Noticia;
 use App\Models\Cronista;
 use App\Models\Cronica;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 new class extends Component {
     use WithFileUploads;
@@ -20,7 +21,9 @@ new class extends Component {
     public $destacada;
     public $fecha_publicacion;
     public $cronista_id, $cronica_id;
-    
+    public $prompt = '';
+    public $contenidoGenerado = false;
+    public $contenidoGeneradoTemporal = '';
     public $cronistas = [];
     public $cronicas = [];
 
@@ -31,6 +34,94 @@ new class extends Component {
         $this->tipo = '';
         $this->destacada = null;
     }  
+
+
+//------------------------------ AI GROQ GENERAR---------------------------------------------
+public function generarContenido()
+{
+    // Validar que hay prompt
+    if (empty($this->prompt)) {
+        $this->dispatch('swal', [
+            'icon' => 'warning',
+            'title' => 'Campo requerido',
+            'text' => 'Para generar contenido con IA, debes proporcionar una descripción detallada de lo que deseas crear. Por favor completa el campo de descripción.',
+            'confirmButtonText' => 'Aceptar',
+        ]);
+        return;
+    }
+
+    try {
+        $apiKey = config('services.groq.api_key');
+        
+        if (!$apiKey) {
+            throw new \Exception('GROQ_API_KEY no configurada');
+        }
+
+        $userMessage = $this->prompt;
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $apiKey,
+        ])->post(config('services.groq.api_url') . '/chat/completions', [
+            'model' => 'llama-3.3-70b-versatile',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'Eres un asistente de redacción profesional. Responde siempre en español. Genera contenido de alta calidad, bien estructurado y profesional.'
+                ],
+                [
+                    'role' => 'user',
+                    'content' => $userMessage
+                ]
+            ],
+            'max_tokens' => 2048,
+            'temperature' => 0.7,
+        ]);
+
+        if ($response->successful()) {
+            $this->contenidoGeneradoTemporal = $response->json()['choices'][0]['message']['content'];
+            $this->contenidoGenerado = true;
+            
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => '✅ Contenido generado',
+                'text' => 'Tu contenido ha sido generado exitosamente. Revisa y edita si es necesario.',
+                'confirmButtonText' => 'OK',
+            ]);
+        } else {
+            throw new \Exception('Error en la API');
+        }
+    } catch (\Exception $e) {
+        \Log::error('Groq Error: ' . $e->getMessage());
+        $this->contenidoGenerado = false;
+        
+        $this->dispatch('swal', [
+            'icon' => 'error',
+            'title' => '❌ Error',
+            'text' => 'Ocurrió un error al generar el contenido. Por favor intenta de nuevo.',
+            'confirmButtonText' => 'Reintentar',
+        ]);
+    }
+}
+
+public function confirmarContenido()
+{
+    $this->contenido = $this->contenidoGeneradoTemporal;
+    $this->dispatch('closeModal', 'persistentModal');
+    $this->reset(['prompt', 'contenidoGenerado', 'contenidoGeneradoTemporal']);
+    
+    $this->dispatch('swal', [
+        'icon' => 'success',
+        'title' => '✅ Contenido confirmado',
+        'text' => 'El contenido ha sido agregado al formulario correctamente.',
+        'confirmButtonText' => 'OK',
+    ]);
+}
+
+public function reiniciarModal()
+{
+    $this->reset(['prompt', 'contenidoGeneradoTemporal', 'contenidoGenerado', 'imagen']);
+}
+// ---------------------------------Rules Validatión-------------------------------------------
     protected function rules()
     {    
         $rules = [
@@ -66,7 +157,7 @@ new class extends Component {
 
         return $rules;
     }
-
+    
     protected $messages = [
         // 🔹 Título
         'titulo.required' => 'El título es obligatorio.',
@@ -171,6 +262,7 @@ new class extends Component {
             return false;
         }
     }
+// -------------------------------------------Guardar Save------------------------------------------------
 
     public function save()
     {
@@ -257,12 +349,12 @@ new class extends Component {
             ]);
         }
     }
-
+// -------------------------------------------Button Cancel------------------------------------------------
     public function cancel()
     {
         return $this->redirect(route('admin.noticias.index'), navigate: true);
     }
-
+// -------------------------------------------Limpiar From------------------------------------------------
     public function limpiar()
     {
         $this->reset([
@@ -289,6 +381,6 @@ new class extends Component {
             ['name' => 'Dashboard', 'route' => route('admin.dashboard')],
             ['name' => 'Crear Noticia'],
         ]" />
-    </x-slot>
+    </x-slot>    
     @include('livewire.pages.admin.noticias.form.form', ['mode' => $mode])
 </div>

@@ -24,8 +24,13 @@ public function concejales()
 }
 
     // Relación con la tabla Miembros para acceder a campos extras directamente
-    public function miembros()
+ public function miembros()
+{
+    return $this->belongsToMany(Miembro::class, 'comision_concejal', 'comision_id', 'miembro_id');
+}
+        // Relación: una comisión tiene muchas solicitudes de derecho de palabra
+    public function derechosPalabra()
     {
-        return $this->hasMany(Miembro::class);
+        return $this->hasMany(DerechoDePalabra::class, 'comision_id');
     }
 }

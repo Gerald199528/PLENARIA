@@ -4,11 +4,16 @@ use App\Models\DerechoDePalabra;
 use App\Mail\ConfirmarDerechoPalabraMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Setting;
+use Carbon\Carbon;
 
 new class extends Component
 {
     public $derechoPalabraId = null;
     public $email = '';
+    public $comision = '';
     public $estado = '';
     public $observaciones = '';
 
@@ -40,15 +45,13 @@ new class extends Component
     public function abrirConfirmarModal($id)
     {
         try {
-            // Limpiar datos previos PRIMERO
             $this->resetForm();
             
             $this->derechoPalabraId = $id;
-            $derecho = DerechoDePalabra::findOrFail($id);
+            $derecho = DerechoDePalabra::with('comision')->findOrFail($id);
             
             Log::info('Modal abierto - ID: ' . $id . ' - Email: ' . $derecho->email);
             
-            // Validar si ya está aprobada
             if ($derecho->estado === 'aprobada') {
                 $this->dispatch('showAlert', [
                     'icon' => 'warning',
@@ -58,12 +61,12 @@ new class extends Component
                 return;
             }
             
-            // Asignar email del registro específico
             $this->email = $derecho->email ?? '';
+            $this->comision = $derecho->comision?->nombre ?? '';
             $this->estado = '';
             $this->observaciones = '';
             
-            Log::info('Datos cargados - Email asignado: ' . $this->email);
+            Log::info('Datos cargados - Email: ' . $this->email . ' - Comisión: ' . $this->comision);
             
         } catch (\Exception $e) {
             Log::error('Error al abrir modal: ' . $e->getMessage());
@@ -78,12 +81,10 @@ new class extends Component
     public function confirmar()
     {
         try {
-            // Validar datos
             $this->validate();
 
             $derecho = DerechoDePalabra::findOrFail($this->derechoPalabraId);
             
-            // Validar si ya está aprobada
             if ($derecho->estado === 'aprobada') {
                 $this->dispatch('showAlert', [
                     'icon' => 'warning',
@@ -93,25 +94,19 @@ new class extends Component
                 return;
             }
             
-            // Actualizar estado ANTES de enviar email
             $derecho->update([
                 'estado' => $this->estado,
                 'observaciones' => trim($this->observaciones),
                 'fecha_respuesta' => now(),
             ]);
 
-            // Enviar email
             Mail::send(new ConfirmarDerechoPalabraMail($derecho, $this->observaciones));
 
             Log::info('Email enviado exitosamente a: ' . $derecho->email . ' para ID: ' . $this->derechoPalabraId);
 
-            // Cerrar modal
             $this->dispatch('closeModal', name: 'confirmarModal');
-            
-            // Refrescar tabla
             $this->dispatch('pg:eventRefresh-derecho-palabra-table');
             
-            // Mostrar éxito
             $this->dispatch('showAlert', [
                 'icon' => 'success',
                 'title' => '¡Éxito!',
@@ -141,22 +136,83 @@ new class extends Component
         }
     }
 
+    public function generatePdf(DerechoDePalabra $derecho)
+    {
+        try {
+            $logoPath = Setting::get('logo_horizontal');
+            $logoIcon = null;
+            if ($logoPath && Storage::disk('public')->exists($logoPath)) {
+                $imageContent = Storage::disk('public')->get($logoPath);
+                $mimeType = Storage::disk('public')->mimeType($logoPath);
+                $logoIcon = 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+            }
+
+            $primaryColor = Setting::get('primary_color', '#0f2440');
+            $secondaryColor = Setting::get('secondary_color', '#00d4ff');
+
+            $fields = [
+                ['label' => 'Cédula', 'value' => $derecho->cedula],
+                ['label' => 'Nombre', 'value' => $derecho->nombre . ' ' . $derecho->apellido],
+                ['label' => 'Email', 'value' => $derecho->email],
+                ['label' => 'Teléfono', 'value' => $derecho->telefono_movil],
+                ['label' => 'WhatsApp', 'value' => $derecho->whatsapp ?? 'N/A'],
+                ['label' => 'Sesión', 'value' => $derecho->sesion?->titulo ?? 'Sin sesión'],
+                ['label' => 'Comisión', 'value' => $derecho->comision?->nombre ?? 'Sin comisión'],
+                ['label' => 'Motivo', 'value' => $derecho->motivo_solicitud],
+                ['label' => 'Estado', 'value' => ucfirst($derecho->estado), 'highlight' => true],
+                ['label' => 'Observaciones', 'value' => $derecho->observaciones ?? 'N/A'],
+                ['label' => 'Fecha Respuesta', 'value' => $derecho->fecha_respuesta ? Carbon::parse($derecho->fecha_respuesta)->timezone('America/Caracas')->format('d/m/Y H:i') : 'Pendiente'],
+                ['label' => 'Fecha Solicitud', 'value' => Carbon::parse($derecho->created_at)->timezone('America/Caracas')->format('d/m/Y H:i')],
+            ];
+
+            $html = view('livewire.pages.admin.pdf.pdf-layout', [
+                'fields' => $fields,
+                'title' => 'Derecho de Palabra',
+                'subtitle' => $derecho->nombre . ' ' . $derecho->apellido,
+                'logo_icon' => $logoIcon,
+                'primaryColor' => $primaryColor,
+                'secondaryColor' => $secondaryColor,
+                'tags' => ['Derecho de Palabra', ucfirst($derecho->estado), $derecho->sesion?->titulo],
+                'badgeTitle' => 'Clasificación',
+                'sectionTitle' => 'Datos de la Solicitud',
+            ])->render();
+
+            $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>' . $html;
+
+            $pdf = Pdf::loadHTML($html)
+                ->setPaper('a4')
+                ->setOption('encoding', 'UTF-8')
+                ->setOption('default_font', 'DejaVu Sans');
+
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, "derecho_palabra_" . $derecho->id . "_" . now()->format('d-m-Y_H-i') . ".pdf", [
+                'Content-Type' => 'application/pdf',
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error en generatePdf: ' . $e->getMessage());
+            $this->dispatch('showAlert', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Error al generar PDF: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
     public function deleteDerechoPalabra($derechoPalabraId)
     {
         try {
             $derecho = DerechoDePalabra::findOrFail($derechoPalabraId);
             
-            // Eliminar el registro de la BD
             $derecho->delete();
 
-            // Alerta de éxito
             $this->dispatch('showAlert', [
                 'icon' => 'success',
                 'title' => 'Eliminado',
                 'text' => 'La solicitud de derecho de palabra se eliminó correctamente',
             ]);
 
-            // Refrescar la tabla automáticamente
             $this->dispatch('pg:eventRefresh-derecho-palabra-table');
 
         } catch (\Exception $e) {
@@ -170,11 +226,11 @@ new class extends Component
 
     public function resetForm()
     {
-        $this->reset(['derechoPalabraId', 'email', 'estado', 'observaciones']);
+        $this->reset(['derechoPalabraId', 'email', 'comision', 'estado', 'observaciones']);
         $this->resetValidation();
     }
-}; ?>
-
+};
+?>
 <div>
     <x-slot name="breadcrumbs">
         <livewire:components.breadcrumb :breadcrumbs="[

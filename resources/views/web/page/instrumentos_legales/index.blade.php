@@ -4,7 +4,7 @@
 @section('before_content')
     @include('web.navegation.header')
     @include('web.page.instrumentos_legales.html.section') 
-    @include('web.page.instrumentos_legales.js.script')
+    @include('web.page.instrumentos_legales.js.sweetalert')
 @endsection
 @section('backToTop')
     <button id="backToTop" class="fixed bottom-6 right-6 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-blue-800 transition-all duration-300 transform scale-0 z-50">
