@@ -314,7 +314,7 @@ chatbotToggle.addEventListener('click', () => {
             isFirstOpen = false;
         }
         
-        chatbotInput.focus();
+        // chatbotInput.focus(); ← COMENTADA - Ya no hace autofocus
     } else {                 
         chatbotWindow.classList.add('hidden');
         chatbotToggle.classList.remove('hidden');
