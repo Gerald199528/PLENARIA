@@ -1,3 +1,20 @@
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- AOS CSS - Solo en Desktop -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" media="(min-width: 768px)">
+<!-- Script para desactivar AOS en móvil -->
+<script>
+    const isMobile = window.innerWidth < 768;    
+    if (isMobile) {     
+        window.AOS = { init: () => {} };
+    } else {   
+        const aosScript = document.createElement('script');
+        aosScript.src = 'https://unpkg.com/aos@2.3.1/dist/aos.js';
+        aosScript.async = true;
+        document.head.appendChild(aosScript);
+    }
+</script>
+<!-- Tailwind Estilos Principales -->
 <style>
     :root {
         --primary-color: {{ \App\Models\Setting::get('primary_color', '#1d4ed8') }};
@@ -12,11 +29,6 @@
         --shadow-large: 0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.04);
     }
 </style>
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- AOS CSS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
 <!-- Tailwind Config y Estilos -->
 <script>
     tailwind.config = {
@@ -264,8 +276,7 @@
     #copyLinkBtn:active {
         animation: pulse-click 0.3s ease-in-out;
     }
-</style>
-    
+</style>    
         <style>
             /* Noticias Detalladas*/
             .prose p {

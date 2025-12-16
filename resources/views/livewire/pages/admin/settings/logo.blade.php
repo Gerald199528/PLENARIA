@@ -397,13 +397,13 @@ new class extends Component {
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <i class="fas fa-palette text-orange-500"></i>
-                       Logo  Plenaria "login, Dashboard, ChatBot" 
+                       Logo  Plenaria "login, Dashboard" 
                     </h3>
                 </div>
                     <div class="mb-3 p-3 bg-blue-50 dark:bg-orange-900/30 border-l-4 border-orange-500 rounded">
                     <p class="text-sm text-orange-700 dark:text-orange-300">
                         <i class="fas fa-info-circle text-orange-500 mr-2"></i>
-                       Logo principal "PLENARIA" Implantado en (Login, Dashboard,Chatbot)
+                       Logo principal "PLENARIA" Implantado en (Login, Dashboard)
                     </p>
                 </div>
                 
