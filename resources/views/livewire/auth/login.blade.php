@@ -88,19 +88,19 @@ $logoUrl = $logoPath ? asset('storage/' . $logoPath) : null;
 
         <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
             <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">          
-                <!-- Logo -->
-                <a href="{{ route('home') }}" class="flex items-center mb-6 gap-3 group">
-                    @if($logoUrl)
-                        <!-- Logo desde BD - Tamaño aumentado -->
-                        <div class="w-25 h-25 md:w-25 md:h-25 flex items-center justify-center rounded shadow-lg animate-bounce overflow-hidden" style="animation-duration: 5s;">
-                            <img src="{{ $logoUrl }}" alt="Logo" class="w-full h-full object-contain">
-                        </div>
-                    @endif
-                    
-                <span class="text-6xl md:text-4xl lg:text-6xl font-bold tracking-wider text-white group-hover:text-gray-100 transition-all duration-300 -ml-2 md:-ml-4">
-            LENARIA
-        </span>
-                </a>
+                    <!-- Logo Responsive -->
+        <a href="{{ route('home') }}" class="flex items-center mb-6 gap-2 sm:gap-3 group">
+            @if($logoUrl)
+                <!-- Logo desde BD - Responsive -->
+                <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded shadow-lg animate-bounce overflow-hidden" style="animation-duration: 5s;">
+                    <img src="{{ $logoUrl }}" alt="Logo" class="w-full h-full object-contain">
+                </div>
+            @endif
+            
+            <span class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-wider text-white group-hover:text-gray-100 transition-all duration-300 -ml-1 sm:-ml-2 md:-ml-3 lg:-ml-4">
+                LENARIA
+            </span>
+        </a>
         <!-- Formulario -->
         <div class="w-full bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl backdrop-blur-md md:mt-0 sm:max-w-md xl:p-0 transform transition-transform duration-700 ease-out animate-fadeIn scale-95 hover:scale-100">
             <div class="p-6 space-y-6 md:space-y-8 sm:p-8">

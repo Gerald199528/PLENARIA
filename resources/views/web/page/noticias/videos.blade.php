@@ -59,8 +59,15 @@
                                 <iframe class="w-full h-full" src="https://www.facebook.com/plugins/video.php?href={{ urlencode($video->video_url) }}&show_text=false&width=560&appId=123456789" 
                                     frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>
                             @elseif(strpos($video->video_url, 'instagram') !== false)
-                                <blockquote class="instagram-media w-full h-full" data-instgrm-permalink="{{ $video->video_url }}"></blockquote>
-                                <script async src="//www.instagram.com/embed.js"></script>
+                                <a href="{{ $video->video_url }}" target="_blank" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 group-hover:opacity-80 transition-all">
+                                    <div class="text-center">
+                                        <div class="bg-white text-pink-600 rounded-full p-5 group-hover:scale-110 transition-transform mb-4">
+                                            <i class="fab fa-instagram text-2xl"></i>
+                                        </div>
+                                        <p class="text-white font-semibold">Ver en Instagram</p>
+                                        <p class="text-white/80 text-sm mt-2">Haz clic para abrir</p>
+                                    </div>
+                                </a>
                             @else
                                 {{-- Video genérico con imagen de portada --}}
                                 <img src="{{ asset('storage/' . $video->imagen) }}" 
@@ -87,9 +94,46 @@
                                 </div>
                             </button>
                         @endif
-                        <div class="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">
-                            <i class="fas fa-video mr-1"></i>VIDEO
-                        </div>
+                        
+                        {{-- Badge con logo de plataforma o etiqueta VIDEO --}}
+                        @php
+                            $isYoutube = strpos($video->video_url, 'youtube') !== false || strpos($video->video_url, 'youtu.be') !== false;
+                            $isVimeo = strpos($video->video_url, 'vimeo') !== false;
+                            $isTikTok = strpos($video->video_url, 'tiktok') !== false;
+                            $isFacebook = strpos($video->video_url, 'facebook') !== false || strpos($video->video_url, 'fb.watch') !== false;
+                            $isInstagram = strpos($video->video_url, 'instagram') !== false;
+                            $isExternalPlatform = ($video->tipo_video === 'url') && ($isYoutube || $isVimeo || $isTikTok || $isFacebook || $isInstagram);
+                        @endphp
+                        
+                        @if($isExternalPlatform)
+                            {{-- Logos de plataformas externas --}}
+                            @if($isYoutube)
+                                <div class="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
+                                    <i class="fab fa-youtube"></i> YouTube
+                                </div>
+                            @elseif($isVimeo)
+                                <div class="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
+                                    <i class="fab fa-vimeo"></i> Vimeo
+                                </div>
+                            @elseif($isTikTok)
+                                <div class="absolute top-3 right-3 bg-black text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
+                                    <i class="fab fa-tiktok"></i> TikTok
+                                </div>
+                            @elseif($isFacebook)
+                                <div class="absolute top-3 right-3 bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
+                                    <i class="fab fa-facebook"></i> Facebook
+                                </div>
+                            @elseif($isInstagram)
+                                <div class="absolute top-3 right-3 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white px-3 py-1 rounded text-xs font-bold flex items-center gap-1">
+                                    <i class="fab fa-instagram"></i> Instagram
+                                </div>
+                            @endif
+                        @else
+                            {{-- Etiqueta VIDEO solo para archivos locales --}}
+                            <div class="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">
+                                <i class="fas fa-video mr-1"></i>VIDEO
+                            </div>
+                        @endif
                     </div>
                     <div class="p-4">
                         <div class="text-gray-500 text-xs mb-2">

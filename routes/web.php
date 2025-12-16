@@ -5,6 +5,7 @@ use App\Http\Controllers\InstrumentosLegalesController;
 use App\Http\Controllers\NoticiaCompletaController;
 use App\Http\Controllers\DerechodePalabraController;
 use App\Http\Controllers\SesionMunicipalController;
+use App\Http\Controllers\ChabotWebController;
 
 Route::get('/', function () {
     $empresa = \App\Models\Empresa::first();
@@ -98,6 +99,7 @@ Route::get('/', function () {
         'comisiones' => $comisiones,  
     ]);
     
+    
 })->name('home');
 Route::resource('instrumentos_legales', InstrumentosLegalesController::class);
 // En tu archivo routes/web.php
@@ -107,6 +109,8 @@ Route::get('/noticias/{id}', [NoticiaCompletaController::class, 'show'])->name('
 Route::resource('derecho-palabra', DerechodePalabraController::class, ['only' => ['create', 'store']]);
 Route::get('/participacion-ciudadana', [SesionMunicipalController::class, 'index'])->name('web.page.participacion_ciudadana.index');
 Route::get('/participacion-ciudadana/estadisticas', [SesionMunicipalController::class, 'show'])->name('web.page.participacion_ciudadana.show');
+Route::get('/chatbot', [ChabotWebController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/send-message', [ChabotWebController::class, 'sendMessage']);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
