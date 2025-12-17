@@ -30,11 +30,12 @@ class ChabotWebController extends Controller
         ]);
 
         try {
-            $groqApiKey = env('GROQ_API_KEY');
-            $groqUrl = env('GROQ_API_URL', 'https://api.groq.com/openai/v1');
-  
+       
+            $groqApiKey = config('services.groq.api_key');
+            $groqUrl = config('services.groq.api_url', 'https://api.groq.com/openai/v1');
+
             if (!$groqApiKey) {
-                \Log::error('GROQ_API_KEY no está configurada en .env');
+                \Log::error('GROQ_API_KEY no está configurada en config/services.php');
                 return response()->json([
                     'success' => false,
                     'message' => 'Error de configuración: API key no disponible'
@@ -45,9 +46,9 @@ class ChabotWebController extends Controller
                 'Authorization' => 'Bearer ' . $groqApiKey,
                 'Content-Type' => 'application/json',
             ])
-            ->timeout(30)         
-            ->connectTimeout(15)  
-            ->retry(2, 100)       
+            ->timeout(30)
+            ->connectTimeout(15)
+            ->retry(2, 100)
             ->post($groqUrl . '/chat/completions', [
                 'model' => 'llama-3.3-70b-versatile',
                 'messages' => [
@@ -64,7 +65,7 @@ class ChabotWebController extends Controller
                 'max_tokens' => 1024,
             ]);
 
-            if ($response->successful()) {             
+            if ($response->successful()) {
                 $data = $response->json();
                 $botMessage = $data['choices'][0]['message']['content'] ?? 'No pude generar una respuesta válida de la IA.';
                 
@@ -72,18 +73,20 @@ class ChabotWebController extends Controller
                     'success' => true,
                     'message' => $botMessage
                 ]);
-            } else {         
+
+            } else {
                 $statusCode = $response->status();
-                $errorBody = $response->json();        
+                $errorBody = $response->json();
+
                 $errorMessageDetail = 'Respuesta de error desconocida o no JSON.';
                 if (is_array($errorBody) && isset($errorBody['error']['message'])) {
                     $errorMessageDetail = $errorBody['error']['message'];
-                } elseif (is_string($response->body())) {             
+                } elseif (is_string($response->body())) {
                     $errorMessageDetail = substr($response->body(), 0, 200) . '...';
                 }
 
                 $userFriendlyError = "Error de Groq (HTTP $statusCode): $errorMessageDetail";
-                
+
                 \Log::error("Error de API de Groq: Estado $statusCode. Mensaje: " . json_encode($errorBody));
 
                 return response()->json([
@@ -93,10 +96,10 @@ class ChabotWebController extends Controller
             }
 
         } catch (RequestException $e) {
-          
             $errorMsg = $e->getMessage();
-            
-            \Log::error("RequestException en Groq API: " . $errorMsg);          
+
+            \Log::error("RequestException en Groq API: " . $errorMsg);
+
             if (strpos($errorMsg, 'timed out') !== false) {
                 $userMessage = 'Timeout: La API tardó demasiado. Verifica la conexión del servidor.';
             } elseif (strpos($errorMsg, 'Failed to resolve') !== false || strpos($errorMsg, 'getaddrinfo') !== false) {
@@ -112,7 +115,7 @@ class ChabotWebController extends Controller
                 'message' => $userMessage
             ], 500);
 
-        } catch (\Exception $e) {           
+        } catch (\Exception $e) {
             $errorMsg = $e->getMessage();
             \Log::error("Error inesperado en Chatbot: " . $errorMsg);
 
