@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SesionMunicipal;
 use App\Models\Solicitud;
 use App\Models\Empresa;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class SesionMunicipalController extends Controller
@@ -84,26 +85,26 @@ class SesionMunicipalController extends Controller
     public function getEstadisticas(): array
     {
         // Estadísticas de Derecho de Palabra
-        $totalDerechoPalabra = \DB::table('derecho_palabra')->count();
-        $derechoPalabraAprobadas = \DB::table('derecho_palabra')
+        $totalDerechoPalabra = DB::table('derecho_palabra')->count();
+        $derechoPalabraAprobadas = DB::table('derecho_palabra')
             ->where('estado', 'aprobada')
             ->count();
-        $derechoPalabraPendientes = \DB::table('derecho_palabra')
+        $derechoPalabraPendientes = DB::table('derecho_palabra')
             ->where('estado', 'pendiente')
             ->count();
-        $ciudadanosUnicos = \DB::table('derecho_palabra')
+        $ciudadanosUnicos = DB::table('derecho_palabra')
             ->distinct('ciudadano_id')
             ->count('ciudadano_id');
 
         // Estadísticas de Atención Ciudadana
-        $totalSolicitudes = \DB::table('solicitudes')->count();
-        $solicitudesAprobadas = \DB::table('solicitudes')
+        $totalSolicitudes = DB::table('solicitudes')->count();
+        $solicitudesAprobadas = DB::table('solicitudes')
             ->where('estado', 'aprobado')
             ->count();
-        $solicitudesPendientes = \DB::table('solicitudes')
+        $solicitudesPendientes = DB::table('solicitudes')
             ->where('estado', 'pendiente')
             ->count();
-        $solicitudesRechazadas = \DB::table('solicitudes')
+        $solicitudesRechazadas = DB::table('solicitudes')
             ->where('estado', 'rechazado')
             ->count();
 
@@ -114,6 +115,13 @@ class SesionMunicipalController extends Controller
 
         $tasaSolicitudes = $totalSolicitudes > 0
             ? round(($solicitudesAprobadas / $totalSolicitudes) * 100)
+            : 0;
+
+        // Calcular tasa total
+        $totalSolicitudesGeneral = $totalDerechoPalabra + $totalSolicitudes;
+        $totalAprobadas = $derechoPalabraAprobadas + $solicitudesAprobadas;
+        $tasaTotal = $totalSolicitudesGeneral > 0
+            ? round(($totalAprobadas / $totalSolicitudesGeneral) * 100)
             : 0;
 
         return [
@@ -134,9 +142,9 @@ class SesionMunicipalController extends Controller
                 'tasa' => $tasaSolicitudes,
             ],
             // Totales
-            'solicitudes' => $totalDerechoPalabra + $totalSolicitudes,
-            'aprobadas' => $derechoPalabraAprobadas + $solicitudesAprobadas,
-            'tasa' => round((($derechoPalabraAprobadas + $solicitudesAprobadas) / ($totalDerechoPalabra + $totalSolicitudes)) * 100),
+            'solicitudes' => $totalSolicitudesGeneral,
+            'aprobadas' => $totalAprobadas,
+            'tasa' => $tasaTotal,
         ];
     }
 }

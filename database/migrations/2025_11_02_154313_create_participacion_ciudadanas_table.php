@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('telefono_movil');
             $table->string('whatsapp');
+            $table->boolean('whatsapp_send')->default(true);
             $table->timestamps();
 
             $table->index('cedula');

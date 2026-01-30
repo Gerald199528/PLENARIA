@@ -85,8 +85,8 @@ final class SolicitudTable extends PowerGridComponent
                 match($row->estado) {
                     'pendiente' => '<span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">Pendiente</span>',
                     'en_proceso' => '<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">En Proceso</span>',
-                    'aprobada' => '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Aprobada</span>',
-                    'rechazada' => '<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">Rechazada</span>',
+                    'aprobado' => '<span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Aprobado</span>',
+                    'rechazado' => '<span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">Rechazado</span>',
                     default => $row->estado
                 }
             )
@@ -185,7 +185,7 @@ final class SolicitudTable extends PowerGridComponent
                 ->slot('<i class="fas fa-handshake"></i>')
                 ->class('bg-green-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-md hover:bg-green-700 shadow-sm mr-1 sm:mr-2 text-xs sm:text-sm transition-all duration-300 hover:scale-105')
                 ->attributes([
-                    'wire:click' => '$dispatch(\'abrir-confirmar-modal\', { id: ' . $row->id . ' })',
+                    'wire:click' => '$dispatch(\'abrir-confirmar-modal-solicitud\', { id: ' . $row->id . ' })',
                     'title' => 'Confirmar solicitud'
                 ]),
 

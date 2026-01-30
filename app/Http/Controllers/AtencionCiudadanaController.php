@@ -8,11 +8,20 @@ use App\Models\Empresa;
 use App\Models\Ciudadano;
 use App\Models\DerechoDePalabra;
 use App\Models\Solicitud;
+use App\Services\EvolutionService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class AtencionCiudadanaController extends Controller
 {
+    protected EvolutionService $evolutionService;
+
+    public function __construct(EvolutionService $evolutionService)
+    {
+        $this->evolutionService = $evolutionService;
+    }
+
     /**
      * Mostrar formulario de nueva solicitud
      */
@@ -89,6 +98,7 @@ class AtencionCiudadanaController extends Controller
                 'email' => $validated['email'],
                 'telefono_movil' => $telefonoMovil,
                 'whatsapp' => $whatsapp,
+                'whatsapp_send' => true,
             ]
         );
 
@@ -105,7 +115,7 @@ class AtencionCiudadanaController extends Controller
      */
     private function guardarDerechoPalabra(Ciudadano $ciudadano, array $validated)
     {
-        DerechoDePalabra::create([
+        $derechoPalabra = DerechoDePalabra::create([
             'ciudadano_id' => $ciudadano->id,
             'sesion_municipal_id' => $validated['sesion_municipal_id'],
             'comision_id' => $validated['comision_id'] ?? null,
@@ -113,6 +123,13 @@ class AtencionCiudadanaController extends Controller
             'estado' => 'pendiente',
             'acepta_terminos' => true,
         ]);
+
+        // Enviar WhatsApp de confirmación
+        try {
+            $this->enviarWhatsAppDerechoPalabra($ciudadano, $derechoPalabra);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar WhatsApp de derecho de palabra', ['error' => $e->getMessage()]);
+        }
 
         return redirect(route('home') . '#participacion')
             ->with('success', 'Estimado ciudadano, su solicitud de derecho de palabra fue enviada exitosamente. Pronto nos comunicaremos con usted vía correo electrónico, llamada o WhatsApp.');
@@ -123,7 +140,7 @@ class AtencionCiudadanaController extends Controller
      */
     private function guardarAtencionCiudadana(Ciudadano $ciudadano, array $validated)
     {
-        Solicitud::create([
+        $solicitud = Solicitud::create([
             'ciudadano_id' => $ciudadano->id,
             'tipo_solicitud_id' => $validated['tipo_solicitud_id'],
             'descripcion' => $validated['descripcion'],
@@ -131,8 +148,98 @@ class AtencionCiudadanaController extends Controller
             'acepta_terminos' => true,
         ]);
 
+        // Enviar WhatsApp de confirmación
+        try {
+            $this->enviarWhatsAppAtencionCiudadana($ciudadano, $solicitud);
+        } catch (\Exception $e) {
+            Log::error('Error al enviar WhatsApp de atención ciudadana', ['error' => $e->getMessage()]);
+        }
+
         return redirect(route('home') . '#participacion')
             ->with('success', 'Estimado ciudadano, su solicitud de atención fue enviada exitosamente. Pronto nos comunicaremos con usted vía correo electrónico, llamada o WhatsApp.');
+    }
+
+    /**
+     * Enviar WhatsApp para Derecho de Palabra
+     */
+    private function enviarWhatsAppDerechoPalabra(Ciudadano $ciudadano, DerechoDePalabra $derechoPalabra)
+    {
+        // Obtener datos para el mensaje
+        $sesion = $derechoPalabra->sesionMunicipal;
+        $sesionTitulo = $sesion ? $sesion->titulo : 'Sesión Municipal';
+
+        $comision = null;
+        if ($derechoPalabra->comision_id) {
+            $comision = $derechoPalabra->comision;
+            $comision = $comision ? $comision->nombre : null;
+        }
+
+        // Obtener nombre de empresa
+        $empresa = Empresa::first();
+        $nombreEmpresa = $empresa && $empresa->razon_social ? $empresa->razon_social : 'Plenaria';
+
+        // Construir mensaje
+        $mensaje = "✅ *Solicitud de Derecho de Palabra Recibida*\n\n";
+        $mensaje .= "Estimado/a *{$ciudadano->nombre} {$ciudadano->apellido}*,\n\n";
+        $mensaje .= "Le confirmamos que su solicitud de derecho de palabra ha sido recibida exitosamente por {$nombreEmpresa}.\n\n";
+        $mensaje .= "📋 *Sesión:* {$sesionTitulo}\n";
+        if ($comision) {
+            $mensaje .= "👥 *Comisión:* {$comision}\n";
+        }
+        $mensaje .= "\n";
+        $mensaje .= "Pronto nos comunicaremos con usted para confirmar su participación. Agradecemos su interés en participar activamente en la vida municipal.\n\n";
+        $mensaje .= "Si tiene alguna consulta, estamos a su disposición.";
+
+        // Enviar por WhatsApp
+        $response = $this->evolutionService->sendMessage($ciudadano->whatsapp, $mensaje);
+
+        if (!$response['error']) {
+            Log::info('WhatsApp de derecho de palabra enviado', [
+                'ciudadano_id' => $ciudadano->id,
+                'solicitud_id' => $derechoPalabra->id,
+            ]);
+        } else {
+            Log::warning('Error al enviar WhatsApp de derecho de palabra', [
+                'ciudadano_id' => $ciudadano->id,
+                'error' => $response['message'] ?? 'Error desconocido',
+            ]);
+        }
+    }
+
+    /**
+     * Enviar WhatsApp para Atención Ciudadana
+     */
+    private function enviarWhatsAppAtencionCiudadana(Ciudadano $ciudadano, Solicitud $solicitud)
+    {
+        // Obtener tipo de solicitud
+        $tipoSolicitud = $solicitud->tipoSolicitud;
+        $tipoSolicitudNombre = $tipoSolicitud ? $tipoSolicitud->nombre : 'atención ciudadana';
+
+        // Obtener nombre de empresa
+        $empresa = Empresa::first();
+        $nombreEmpresa = $empresa && $empresa->razon_social ? $empresa->razon_social : 'Plenaria';
+
+        // Construir mensaje
+        $mensaje = "✅ *Solicitud de Atención Recibida*\n\n";
+        $mensaje .= "Estimado/a *{$ciudadano->nombre} {$ciudadano->apellido}*,\n\n";
+        $mensaje .= "Le confirmamos que su solicitud de {$tipoSolicitudNombre} ha sido recibida exitosamente por {$nombreEmpresa}.\n\n";
+        $mensaje .= "Pronto nos comunicaremos con usted vía correo electrónico, llamada o WhatsApp para brindarle la atención que requiere.\n\n";
+        $mensaje .= "Agradecemos su confianza en nuestros servicios de participación ciudadana. Si tiene alguna consulta adicional, estamos a su disposición.";
+
+        // Enviar por WhatsApp
+        $response = $this->evolutionService->sendMessage($ciudadano->whatsapp, $mensaje);
+
+        if (!$response['error']) {
+            Log::info('WhatsApp de atención ciudadana enviado', [
+                'ciudadano_id' => $ciudadano->id,
+                'solicitud_id' => $solicitud->id,
+            ]);
+        } else {
+            Log::warning('Error al enviar WhatsApp de atención ciudadana', [
+                'ciudadano_id' => $ciudadano->id,
+                'error' => $response['message'] ?? 'Error desconocido',
+            ]);
+        }
     }
 
     /**
