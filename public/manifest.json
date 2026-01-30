@@ -1,0 +1,24 @@
+{
+    "name": "PLENARIA - Tu Concejo Municipal Digital",
+    "short_name": "PLENARIA",
+    "start_url": "/",
+    "scope": "/",
+    "author": "Tu Municipio",
+    "version": "1.0",
+    "description": "Plataforma Digital para Concejos Municipales - Solución Digital para la Gestión de Concejos Municipales",
+    "orientation": "portrait-primary",
+    "dir": "auto",
+    "lang": "es",
+    "display": "standalone",
+    "themeColor": "#1d4ed8",
+    "theme_color": "#1d4ed8",
+    "backgroundColor": "#ffffff",
+    "background_color": "#ffffff",
+    "icons": [
+        {
+            "src": "logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
