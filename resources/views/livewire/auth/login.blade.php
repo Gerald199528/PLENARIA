@@ -75,14 +75,6 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
 
 
 <div class="flex flex-col gap-12">
-    <!-- Favicon -->
-    @php
-    $faviconPath = \App\Models\Setting::get('logo_icon');
-    $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('default-favicon.ico');
-    @endphp
-    <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
-
     <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">
             <!-- Logo Responsive -->
