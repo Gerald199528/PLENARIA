@@ -89,8 +89,39 @@ class AtencionCiudadanaController extends Controller
         $telefonoMovil = $this->normalizarTelefono($validated['telefono_movil']);
         $whatsapp = $this->normalizarTelefono($validated['whatsapp']);
 
-        // Crear o buscar ciudadano
-        $ciudadano = Ciudadano::firstOrCreate(
+        // Buscar ciudadano
+        $ciudadano = Ciudadano::where('cedula', $cedulaNormalizada)->first();
+
+        // Si es Derecho de Palabra, validar solicitud pendiente
+        if ($validated['tipo_solicitud'] === 'derecho_palabra') {
+            if ($ciudadano) {
+                $solicitudPendiente = DerechoDePalabra::where('ciudadano_id', $ciudadano->id)
+                    ->where('estado', 'pendiente')
+                    ->first();
+
+                if ($solicitudPendiente) {
+                    return redirect(route('home') . '#participacion')
+                        ->with('warning', '⚠️ Ya tiene una solicitud de derecho de palabra pendiente. Espere a que sea procesada antes de enviar otra.');
+                }
+            }
+        }
+
+        // Si es Atención Ciudadana, validar solicitud pendiente
+        if ($validated['tipo_solicitud'] === 'atencion') {
+            if ($ciudadano) {
+                $solicitudPendiente = Solicitud::where('ciudadano_id', $ciudadano->id)
+                    ->where('estado', 'pendiente')
+                    ->first();
+
+                if ($solicitudPendiente) {
+                    return redirect(route('home') . '#participacion')
+                        ->with('warning', '⚠️ Ya tiene una solicitud de atención pendiente. Espere a que sea procesada antes de enviar otra.');
+                }
+            }
+        }
+
+        // Crear o actualizar ciudadano
+        $ciudadano = Ciudadano::updateOrCreate(
             ['cedula' => $cedulaNormalizada],
             [
                 'nombre' => $validated['nombre'],

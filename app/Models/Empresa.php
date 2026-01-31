@@ -27,7 +27,7 @@ class Empresa extends Model
         'email_secundario',
         'domain',
         'actividad',
-        'description',       
+        'description',
         'organigrama_ruta',
         'mision',
         'vision',

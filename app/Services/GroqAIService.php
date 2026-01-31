@@ -34,7 +34,7 @@ class GroqAIService
 
     /**
      * Llama a la API de Groq (compatible con OpenAI)
-     * Método PÚBLICO para que CitizenMessageService pueda usarlo
+     * Método PÚBLICO para que otros servicios puedan usarlo
      */
     public function llamarGroqAPI(string $prompt): array
     {
@@ -138,6 +138,10 @@ class GroqAIService
         return 'Plenaria';
     }
 
+    // ============================================================
+    // MENSAJES DE CONFIRMACIÓN (cuando se recibe la solicitud)
+    // ============================================================
+
     /**
      * Genera un mensaje de confirmación para Derecho de Palabra
      *
@@ -199,7 +203,7 @@ class GroqAIService
     }
 
     /**
-     * Construye el prompt para mensaje de Derecho de Palabra
+     * Construye el prompt para mensaje de Derecho de Palabra (confirmación)
      */
     protected function construirPromptDerechoPalabra(array $datos): string
     {
@@ -237,7 +241,7 @@ class GroqAIService
     }
 
     /**
-     * Mensaje predeterminado para Derecho de Palabra
+     * Mensaje predeterminado para Derecho de Palabra (confirmación)
      */
     protected function mensajePredeterminadoDerechoPalabra(array $datos): string
     {
@@ -316,7 +320,7 @@ class GroqAIService
     }
 
     /**
-     * Construye el prompt para mensaje de Atención Ciudadana
+     * Construye el prompt para mensaje de Atención Ciudadana (confirmación)
      */
     protected function construirPromptAtencionCiudadana(array $datos): string
     {
@@ -349,7 +353,7 @@ class GroqAIService
     }
 
     /**
-     * Mensaje predeterminado para Atención Ciudadana
+     * Mensaje predeterminado para Atención Ciudadana (confirmación)
      */
     protected function mensajePredeterminadoAtencionCiudadana(array $datos): string
     {
@@ -360,8 +364,339 @@ class GroqAIService
         $mensaje = "✅ *Solicitud de Atención Recibida*\n\n";
         $mensaje .= "Estimado/a *{$nombreCiudadano}*,\n\n";
         $mensaje .= "Le confirmamos que su solicitud de {$tipoSolicitud} ha sido recibida exitosamente por {$nombreEmpresa}.\n\n";
-        $mensaje .= "Pronto nos comunicaremos con usted vía correo electrónico, llamada o WhatsApp para brendarle la atención que requiere.\n\n";
+        $mensaje .= "Pronto nos comunicaremos con usted vía correo electrónico, llamada o WhatsApp para brindarle la atención que requiere.\n\n";
         $mensaje .= "Agradecemos su confianza en nuestros servicios de participación ciudadana. Si tiene alguna consulta adicional, estamos a su disposición.";
+
+        return $mensaje;
+    }
+
+    // ============================================================
+    // MENSAJES DE APROBACIÓN (cuando se aprueba la solicitud)
+    // ============================================================
+
+    /**
+     * Genera un mensaje de APROBACIÓN para Derecho de Palabra o Atención Ciudadana
+     *
+     * @param array $datos Información de la solicitud
+     * @param string $tipo 'derecho_palabra' o 'atencion_ciudadana'
+     * @return array
+     */
+    public function generarMensajeAprobacion(array $datos, string $tipo = 'derecho_palabra'): array
+    {
+        if (!$this->isConfigured()) {
+            Log::warning('Groq API no configurada');
+            return [
+                'success' => true,
+                'mensaje' => $this->mensajePredeterminadoAprobacion($datos, $tipo),
+                'es_ia' => false,
+                'motivo' => 'API no configurada',
+            ];
+        }
+
+        try {
+            $prompt = $this->construirPromptAprobacion($datos, $tipo);
+            $response = $this->llamarGroqAPI($prompt);
+
+            if (!$response['success']) {
+                return [
+                    'success' => true,
+                    'mensaje' => $this->mensajePredeterminadoAprobacion($datos, $tipo),
+                    'es_ia' => false,
+                    'motivo' => 'Error en API',
+                ];
+            }
+
+            $mensaje = trim($response['contenido']);
+
+            if (strlen($mensaje) > 1000) {
+                return [
+                    'success' => true,
+                    'mensaje' => $this->mensajePredeterminadoAprobacion($datos, $tipo),
+                    'es_ia' => false,
+                    'motivo' => 'Mensaje muy largo',
+                ];
+            }
+
+            return [
+                'success' => true,
+                'mensaje' => $mensaje,
+                'tokens_usados' => $response['tokens_usados'] ?? 0,
+                'es_ia' => true,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error generando mensaje de aprobación', ['error' => $e->getMessage()]);
+            return [
+                'success' => true,
+                'mensaje' => $this->mensajePredeterminadoAprobacion($datos, $tipo),
+                'es_ia' => false,
+                'motivo' => 'Excepción: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Construye el prompt para mensaje de APROBACIÓN
+     */
+    protected function construirPromptAprobacion(array $datos, string $tipo): string
+    {
+        $nombreCiudadano = $datos['nombre'] ?? 'Ciudadano';
+        $observaciones = $datos['observaciones'] ?? '';
+        $nombreEmpresa = $this->obtenerNombreEmpresa();
+
+        if ($tipo === 'derecho_palabra') {
+            $sesion = $datos['sesion'] ?? 'N/A';
+            $comision = $datos['comision'] ?? null;
+
+            $prompt = "Eres un asistente profesional de la Administración Pública Municipal de {$nombreEmpresa}. ";
+            $prompt .= "Genera un mensaje de WhatsApp APROBANDO una solicitud de DERECHO DE PALABRA. El mensaje debe ser alegre, cordial y profesional.\n\n";
+
+            $prompt .= "## INFORMACIÓN\n";
+            $prompt .= "- Ciudadano: {$nombreCiudadano}\n";
+            $prompt .= "- Sesión: {$sesion}\n";
+            if ($comision) {
+                $prompt .= "- Comisión: {$comision}\n";
+            }
+            if ($observaciones) {
+                $prompt .= "- Observaciones: {$observaciones}\n";
+            }
+
+            $prompt .= "\n## INSTRUCCIONES\n";
+            $prompt .= "1. Comunica que la solicitud ha sido *APROBADA*\n";
+            $prompt .= "2. Felicita al ciudadano por su participación\n";
+            $prompt .= "3. Menciona la sesión donde participará\n";
+            $prompt .= "4. Si hay observaciones, incluye un resumen positivo\n";
+            $prompt .= "5. Indica que pronto recibirá detalles de fecha y hora\n";
+            $prompt .= "6. Usa tono celebratorio pero profesional\n";
+            $prompt .= "7. Máximo 500 caracteres\n";
+            $prompt .= "8. Usa emojis positivos (máximo 3)\n";
+            $prompt .= "9. Formato WhatsApp: *negritas*, _cursivas_\n\n";
+            $prompt .= "Genera SOLO el mensaje.";
+        } else {
+            $tipoSolicitud = $datos['tipo_solicitud'] ?? 'atención ciudadana';
+
+            $prompt = "Eres un asistente profesional de la Administración Pública Municipal de {$nombreEmpresa}. ";
+            $prompt .= "Genera un mensaje de WhatsApp APROBANDO una solicitud de ATENCIÓN CIUDADANA. El mensaje debe ser alegre, cordial y profesional.\n\n";
+
+            $prompt .= "## INFORMACIÓN\n";
+            $prompt .= "- Ciudadano: {$nombreCiudadano}\n";
+            $prompt .= "- Tipo de Solicitud: {$tipoSolicitud}\n";
+            if ($observaciones) {
+                $prompt .= "- Observaciones: {$observaciones}\n";
+            }
+
+            $prompt .= "\n## INSTRUCCIONES\n";
+            $prompt .= "1. Comunica que la solicitud ha sido *APROBADA*\n";
+            $prompt .= "2. Felicita al ciudadano por solicitar atención\n";
+            $prompt .= "3. Menciona el tipo de solicitud\n";
+            $prompt .= "4. Si hay observaciones, incluye un resumen positivo\n";
+            $prompt .= "5. Indica que pronto se comunicarán con detalles\n";
+            $prompt .= "6. Ofrece disponibilidad para consultas\n";
+            $prompt .= "7. Máximo 500 caracteres\n";
+            $prompt .= "8. Usa emojis positivos (máximo 3)\n";
+            $prompt .= "9. Formato WhatsApp: *negritas*, _cursivas_\n\n";
+            $prompt .= "Genera SOLO el mensaje.";
+        }
+
+        return $prompt;
+    }
+
+    /**
+     * Mensaje predeterminado de APROBACIÓN
+     */
+    protected function mensajePredeterminadoAprobacion(array $datos, string $tipo): string
+    {
+        $nombreCiudadano = $datos['nombre'] ?? 'Ciudadano';
+        $nombreEmpresa = $this->obtenerNombreEmpresa();
+
+        if ($tipo === 'derecho_palabra') {
+            $sesion = $datos['sesion'] ?? 'N/A';
+            $comision = $datos['comision'] ?? null;
+
+            $mensaje = "✅ *¡Tu Derecho de Palabra ha sido APROBADO!*\n\n";
+            $mensaje .= "Estimado/a *{$nombreCiudadano}*,\n\n";
+            $mensaje .= "¡Felicidades! Tu solicitud de derecho de palabra ha sido *APROBADA* por {$nombreEmpresa}.\n\n";
+            $mensaje .= "📋 *Sesión:* {$sesion}\n";
+            if ($comision) {
+                $mensaje .= "👥 *Comisión:* {$comision}\n";
+            }
+            $mensaje .= "\n";
+            $mensaje .= "Estamos listos para escuchar tu participación. Pronto te enviaremos los detalles sobre la fecha y hora de la sesión.\n\n";
+            $mensaje .= "Agradecemos tu participación ciudadana.";
+        } else {
+            $tipoSolicitud = $datos['tipo_solicitud'] ?? 'atención ciudadana';
+
+            $mensaje = "✅ *¡Tu Solicitud ha sido APROBADA!*\n\n";
+            $mensaje .= "Estimado/a *{$nombreCiudadano}*,\n\n";
+            $mensaje .= "¡Excelente! Tu solicitud de {$tipoSolicitud} ha sido *APROBADA* por {$nombreEmpresa}.\n\n";
+            $mensaje .= "Pronto te contactaremos vía correo, llamada o WhatsApp con los detalles de cómo procederemos.\n\n";
+            $mensaje .= "Agradecemos tu confianza en nuestros servicios.";
+        }
+
+        return $mensaje;
+    }
+
+    // ============================================================
+    // MENSAJES DE RECHAZO (cuando se rechaza la solicitud)
+    // ============================================================
+
+    /**
+     * Genera un mensaje de RECHAZO para Derecho de Palabra o Atención Ciudadana
+     *
+     * @param array $datos Información de la solicitud
+     * @param string $tipo 'derecho_palabra' o 'atencion_ciudadana'
+     * @return array
+     */
+    public function generarMensajeRechazo(array $datos, string $tipo = 'derecho_palabra'): array
+    {
+        if (!$this->isConfigured()) {
+            Log::warning('Groq API no configurada');
+            return [
+                'success' => true,
+                'mensaje' => $this->mensajePredeterminadoRechazo($datos, $tipo),
+                'es_ia' => false,
+                'motivo' => 'API no configurada',
+            ];
+        }
+
+        try {
+            $prompt = $this->construirPromptRechazo($datos, $tipo);
+            $response = $this->llamarGroqAPI($prompt);
+
+            if (!$response['success']) {
+                return [
+                    'success' => true,
+                    'mensaje' => $this->mensajePredeterminadoRechazo($datos, $tipo),
+                    'es_ia' => false,
+                    'motivo' => 'Error en API',
+                ];
+            }
+
+            $mensaje = trim($response['contenido']);
+
+            if (strlen($mensaje) > 1000) {
+                return [
+                    'success' => true,
+                    'mensaje' => $this->mensajePredeterminadoRechazo($datos, $tipo),
+                    'es_ia' => false,
+                    'motivo' => 'Mensaje muy largo',
+                ];
+            }
+
+            return [
+                'success' => true,
+                'mensaje' => $mensaje,
+                'tokens_usados' => $response['tokens_usados'] ?? 0,
+                'es_ia' => true,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error generando mensaje de rechazo', ['error' => $e->getMessage()]);
+            return [
+                'success' => true,
+                'mensaje' => $this->mensajePredeterminadoRechazo($datos, $tipo),
+                'es_ia' => false,
+                'motivo' => 'Excepción: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Construye el prompt para mensaje de RECHAZO
+     */
+    protected function construirPromptRechazo(array $datos, string $tipo): string
+    {
+        $nombreCiudadano = $datos['nombre'] ?? 'Ciudadano';
+        $observaciones = $datos['observaciones'] ?? '';
+        $nombreEmpresa = $this->obtenerNombreEmpresa();
+
+        if ($tipo === 'derecho_palabra') {
+            $sesion = $datos['sesion'] ?? 'N/A';
+            $comision = $datos['comision'] ?? null;
+
+            $prompt = "Eres un asistente profesional de la Administración Pública Municipal de {$nombreEmpresa}. ";
+            $prompt .= "Genera un mensaje de WhatsApp RECHAZANDO una solicitud de DERECHO DE PALABRA de forma respetuosa y profesional.\n\n";
+
+            $prompt .= "## INFORMACIÓN\n";
+            $prompt .= "- Ciudadano: {$nombreCiudadano}\n";
+            $prompt .= "- Sesión Solicitada: {$sesion}\n";
+            if ($comision) {
+                $prompt .= "- Comisión: {$comision}\n";
+            }
+            if ($observaciones) {
+                $prompt .= "- Motivo del Rechazo: {$observaciones}\n";
+            }
+
+            $prompt .= "\n## INSTRUCCIONES\n";
+            $prompt .= "1. Comunica el rechazo con respeto y empatía\n";
+            $prompt .= "2. Explica brevemente el motivo del rechazo (basado en observaciones)\n";
+            $prompt .= "3. Menciona la sesión a la que se refería\n";
+            $prompt .= "4. Ofrece alternativas: poder apelar o participar en próximas sesiones\n";
+            $prompt .= "5. Mantén tono profesional pero empático\n";
+            $prompt .= "6. Máximo 500 caracteres\n";
+            $prompt .= "7. Evita emojis negativos\n";
+            $prompt .= "8. Formato WhatsApp: *negritas*, _cursivas_\n\n";
+            $prompt .= "Genera SOLO el mensaje.";
+        } else {
+            $tipoSolicitud = $datos['tipo_solicitud'] ?? 'atención ciudadana';
+
+            $prompt = "Eres un asistente profesional de la Administración Pública Municipal de {$nombreEmpresa}. ";
+            $prompt .= "Genera un mensaje de WhatsApp RECHAZANDO una solicitud de ATENCIÓN CIUDADANA de forma respetuosa y profesional.\n\n";
+
+            $prompt .= "## INFORMACIÓN\n";
+            $prompt .= "- Ciudadano: {$nombreCiudadano}\n";
+            $prompt .= "- Tipo de Solicitud: {$tipoSolicitud}\n";
+            if ($observaciones) {
+                $prompt .= "- Motivo del Rechazo: {$observaciones}\n";
+            }
+
+            $prompt .= "\n## INSTRUCCIONES\n";
+            $prompt .= "1. Comunica el rechazo con respeto y empatía\n";
+            $prompt .= "2. Explica brevemente el motivo del rechazo\n";
+            $prompt .= "3. Ofrece alternativas o formas de resolver el problema\n";
+            $prompt .= "4. Invita a contactar si hay dudas\n";
+            $prompt .= "5. Mantén tono profesional pero empático\n";
+            $prompt .= "6. Máximo 500 caracteres\n";
+            $prompt .= "7. Evita emojis negativos\n";
+            $prompt .= "8. Formato WhatsApp: *negritas*, _cursivas_\n\n";
+            $prompt .= "Genera SOLO el mensaje.";
+        }
+
+        return $prompt;
+    }
+
+    /**
+     * Mensaje predeterminado de RECHAZO
+     */
+    protected function mensajePredeterminadoRechazo(array $datos, string $tipo): string
+    {
+        $nombreCiudadano = $datos['nombre'] ?? 'Ciudadano';
+        $nombreEmpresa = $this->obtenerNombreEmpresa();
+
+        if ($tipo === 'derecho_palabra') {
+            $sesion = $datos['sesion'] ?? 'N/A';
+            $comision = $datos['comision'] ?? null;
+
+            $mensaje = "⚠️ *Solicitud de Derecho de Palabra Rechazada*\n\n";
+            $mensaje .= "Estimado/a *{$nombreCiudadano}*,\n\n";
+            $mensaje .= "Lamentamos informarte que tu solicitud de derecho de palabra ha sido *RECHAZADA* por {$nombreEmpresa}.\n\n";
+            $mensaje .= "📋 *Sesión Solicitada:* {$sesion}\n";
+            if ($comision) {
+                $mensaje .= "👥 *Comisión:* {$comision}\n";
+            }
+            $mensaje .= "\n";
+            $mensaje .= "Si consideras que hay un error, puedes presentar una apelación contactándonos directamente.\n\n";
+            $mensaje .= "Agradecemos tu comprensión.";
+        } else {
+            $tipoSolicitud = $datos['tipo_solicitud'] ?? 'atención ciudadana';
+
+            $mensaje = "⚠️ *Solicitud de {$tipoSolicitud} Rechazada*\n\n";
+            $mensaje .= "Estimado/a *{$nombreCiudadano}*,\n\n";
+            $mensaje .= "Lamentamos informarte que tu solicitud ha sido *RECHAZADA*.\n\n";
+            $mensaje .= "Esto puede deberse a que la solicitud no cumple con los requisitos necesarios o está fuera de nuestro alcance.\n\n";
+            $mensaje .= "Si deseas conocer más detalles, no dudes en contactarnos.\n\n";
+            $mensaje .= "Agradecemos tu comprensión.";
+        }
 
         return $mensaje;
     }

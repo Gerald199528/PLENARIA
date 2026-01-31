@@ -143,42 +143,39 @@ class EvolutionService
     }
 
     /**
-     * 10. Enviar mensaje
-     * En LOCAL: Simula el envío
-     * En PRODUCCIÓN: Envía realmente por Evolution API
+     * 10. Enviar mensaje - Intenta conectar a Evolution API real
      */
     public function sendMessage(string $number, string $message): array
     {
-        $instanceName = 'optirango_1';
+        $instanceName = 'Consejo_Municipal_1';
 
-        // En ambiente LOCAL, simula el envío sin conectar a Evolution API
-        if (config('app.env') === 'local') {
-            Log::info('✅ SIMULACIÓN LOCAL - WhatsApp Message', [
+        try {
+            Log::info('Intentando enviar WhatsApp por Evolution API', [
                 'number' => $number,
-                'message_preview' => substr($message, 0, 50) . '...',
                 'instance' => $instanceName,
-                'environment' => 'LOCAL'
+                'api_url' => $this->baseUrl,
             ]);
 
-            return [
-                'error' => false,
-                'success' => true,
-                'message' => '✅ Mensaje simulado en LOCAL (no se envió realmente)',
-                'response' => ['status' => 'SIMULATED_LOCAL']
-            ];
-        }
-
-        // En PRODUCCIÓN, intenta conectar a Evolution API real
-        try {
             $result = $this->sendText($instanceName, $number, $message);
 
             if (isset($result['error']) || isset($result['status']) && $result['status'] !== 'SUCCESS') {
+                Log::error('Error en respuesta de Evolution API', [
+                    'response' => $result,
+                    'number' => $number,
+                ]);
+
                 return [
                     'error' => true,
                     'message' => $result['message'] ?? 'Error al enviar mensaje',
                     'response' => $result
                 ];
             }
+
+            Log::info('✅ WhatsApp enviado exitosamente por Evolution API', [
+                'number' => $number,
+                'instance' => $instanceName,
+                'response' => $result
+            ]);
 
             return [
                 'error' => false,
@@ -188,10 +185,11 @@ class EvolutionService
             ];
 
         } catch (\Exception $e) {
-            Log::error('Error al enviar mensaje WhatsApp', [
+            Log::error('Excepción al enviar WhatsApp', [
                 'error' => $e->getMessage(),
                 'number' => $number,
-                'instance' => $instanceName
+                'instance' => $instanceName,
+                'trace' => $e->getTraceAsString()
             ]);
 
             return [

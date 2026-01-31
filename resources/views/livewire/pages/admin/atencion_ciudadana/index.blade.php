@@ -3,7 +3,10 @@
 use Livewire\Volt\Component;
 use App\Models\Solicitud;
 use App\Models\Ciudadano;
+use App\Models\Empresa;
 use App\Mail\ConfirmarSolicitudMail;
+use App\Services\EvolutionService;
+use App\Services\GroqAIService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -20,6 +23,16 @@ new class extends Component {
     public $descripcion = '';
     public $estado = '';
     public $respuesta = '';
+
+    protected EvolutionService $evolutionService;
+    protected GroqAIService $groqService;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->evolutionService = app(EvolutionService::class);
+        $this->groqService = app(GroqAIService::class);
+    }
 
     protected $listeners = [
         'abrir-confirmar-modal-solicitud' => 'abrirConfirmarModal',
@@ -109,11 +122,23 @@ new class extends Component {
                 'fecha_respuesta' => now(),
             ]);
 
-            // Obtener el ciudadano para enviar el correo
+            // Obtener el ciudadano
             $ciudadano = Ciudadano::findOrFail($this->ciudadanoId);
-            Mail::send(new ConfirmarSolicitudMail($solicitud, $ciudadano, $this->respuesta));
 
-            Log::info('Email enviado exitosamente a: ' . $ciudadano->email . ' para Solicitud ID: ' . $this->solicitudId);
+            // Enviar correo a Mailtrap
+            try {
+                Mail::send(new ConfirmarSolicitudMail($solicitud, $ciudadano, $this->respuesta));
+                Log::info('Email enviado exitosamente a: ' . $ciudadano->email . ' para Solicitud ID: ' . $this->solicitudId);
+            } catch (\Exception $e) {
+                Log::warning('Error al enviar email: ' . $e->getMessage());
+            }
+
+            // Enviar WhatsApp
+            try {
+                $this->enviarWhatsAppAtencionCiudadana($ciudadano, $solicitud);
+            } catch (\Exception $e) {
+                Log::warning('Error al enviar WhatsApp: ' . $e->getMessage());
+            }
 
             $this->dispatch('closeModal', name: 'confirmarModalSolicitud');
             $this->dispatch('pg:eventRefresh-solicitud-table');
@@ -121,7 +146,7 @@ new class extends Component {
             $this->dispatch('showAlert', [
                 'icon' => 'success',
                 'title' => '¡Éxito!',
-                'text' => 'Solicitud confirmada y correo enviado correctamente.',
+                'text' => 'Solicitud confirmada. Email y WhatsApp enviados correctamente.',
                 'timer' => 2000,
                 'timerProgressBar' => true,
             ]);
@@ -143,6 +168,67 @@ new class extends Component {
                 'text' => 'Ocurrió un error: ' . $e->getMessage(),
                 'timer' => 2500,
                 'timerProgressBar' => true,
+            ]);
+        }
+    }
+
+    /**
+     * Enviar WhatsApp para Atención Ciudadana
+     */
+    private function enviarWhatsAppAtencionCiudadana(Ciudadano $ciudadano, Solicitud $solicitud)
+    {
+        // Obtener tipo de solicitud
+        $tipoSolicitud = $solicitud->tipoSolicitud;
+        $tipoSolicitudNombre = $tipoSolicitud ? $tipoSolicitud->nombre : 'atención ciudadana';
+
+        // Obtener nombre de empresa
+        $empresa = Empresa::first();
+        $nombreEmpresa = $empresa && $empresa->razon_social ? $empresa->razon_social : 'Plenaria';
+
+        // Construir mensaje según estado
+        if ($solicitud->estado === 'aprobado') {
+            // Usar Groq para generar mensaje de aprobación
+            $respuestaGroq = $this->groqService->generarMensajeAprobacion([
+                'nombre' => $ciudadano->nombre,
+                'tipo_solicitud' => $tipoSolicitudNombre,
+                'observaciones' => $this->respuesta,
+            ], 'atencion_ciudadana');
+
+            $mensaje = $respuestaGroq['mensaje'];
+
+            Log::info('Mensaje de aprobación generado', [
+                'es_ia' => $respuestaGroq['es_ia'],
+                'motivo' => $respuestaGroq['motivo'] ?? 'IA',
+            ]);
+        } else {
+            // Usar Groq para generar mensaje de rechazo
+            $respuestaGroq = $this->groqService->generarMensajeRechazo([
+                'nombre' => $ciudadano->nombre,
+                'tipo_solicitud' => $tipoSolicitudNombre,
+                'observaciones' => $this->respuesta,
+            ], 'atencion_ciudadana');
+
+            $mensaje = $respuestaGroq['mensaje'];
+
+            Log::info('Mensaje de rechazo generado', [
+                'es_ia' => $respuestaGroq['es_ia'],
+                'motivo' => $respuestaGroq['motivo'] ?? 'IA',
+            ]);
+        }
+
+        // Enviar por WhatsApp
+        $response = $this->evolutionService->sendMessage($ciudadano->whatsapp, $mensaje);
+
+        if (!$response['error']) {
+            Log::info('✅ WhatsApp de atención ciudadana enviado', [
+                'ciudadano_id' => $ciudadano->id,
+                'solicitud_id' => $solicitud->id,
+                'estado' => $solicitud->estado,
+            ]);
+        } else {
+            Log::warning('⚠️ Error al enviar WhatsApp de atención ciudadana', [
+                'ciudadano_id' => $ciudadano->id,
+                'error' => $response['message'] ?? 'Error desconocido',
             ]);
         }
     }

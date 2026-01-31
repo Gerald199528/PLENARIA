@@ -1,7 +1,4 @@
-
-import {
-    defineConfig
-} from 'vite';
+import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from "@tailwindcss/vite";
 
@@ -14,6 +11,12 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        host: true, // permite conexiones externas
+        port: 5173, // puerto de vite
         cors: true,
+        hmr: {
+            host: '192.168.0.118', // <-- PONÉ AQUÍ TU IP LOCAL
+        },
     },
 });
+

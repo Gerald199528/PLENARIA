@@ -6,13 +6,6 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Setting;
 
 new class extends Component {
-    public $logoIcon;
-
-    public function mount()
-    {
-        $this->logoIcon = Setting::get('logo_horizontal_background_solid');
-    }
-
     public function logout(Logout $logout): void
     {
         $logout();
@@ -37,25 +30,22 @@ new class extends Component {
                 </button>
 
                 <!-- LOGO RESPONSIVE -->
-          <a href="{{ route('home') }}" class="flex items-center gap-0 sm:gap-1.5 group flex-shrink-0">
-    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center overflow-hidden">
-        @if($logoIcon && Storage::disk('public')->exists($logoIcon))
-            <img
-                src="{{ Storage::url($logoIcon) }}"
-                alt="Logo"
-                class="w-full h-full object-contain animate-bounce-ultra-slow"
-            >
-        @else
-            <i class="fas fa-landmark text-lg sm:text-2xl md:text-3xl text-white animate-bounce-ultra-slow"></i>
-        @endif
-    </div>
+                <a href="{{ route('home') }}" class="flex items-center gap-0 sm:gap-1.5 group flex-shrink-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center overflow-hidden">
+                        <img
+                            src="{{ asset('Plenaria.png') }}"
+                            alt="Logo Plenaria"
+                            class="w-full h-full object-contain animate-bounce-ultra-slow"
+                        >
+                    </div>
 
-    <!-- TÍTULO -->
-    <span class="hidden sm:block font-bold text-white text-sm sm:text-base md:text-lg lg:text-xl group-hover:underline transition-all duration-300">
-        LENARIA
-    </span>
-</a>
+                    <!-- TÍTULO CON FUENTE MODERNA -->
+                    <span class="hidden sm:block logo-text font-extrabold text-white text-sm sm:text-base md:text-lg lg:text-xl group-hover:text-gray-100 transition-all duration-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+                        LENARIA
+                    </span>
+                </a>
             </div>
+
             <!-- DERECHA -->
             <div class="flex items-center gap-1 sm:gap-2 md:gap-3 ml-auto flex-shrink-0">
                 <livewire:components.teme-switcher />
@@ -85,3 +75,18 @@ new class extends Component {
     </div>
 </nav>
 
+@push('styles')
+<!-- Fuente moderna similar al logo -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+
+<style>
+    /* Estilo personalizado para LENARIA */
+    .logo-text {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+    }
+</style>
+@endpush

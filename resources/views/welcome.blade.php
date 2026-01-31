@@ -1,6 +1,7 @@
 @extends('web.layouts.app')
 
-@section('title', 'PLENARIA - Bienvenido')
+
+@section('title', ($empresa->name ?? 'PLENARIA') . ' - Bienvenido')
 
 {{-- Header y secciones opcionales --}}
 @section('before_content')

@@ -65,89 +65,89 @@ new #[Layout('livewire.layout.client.client')] class extends Component {
                 'minutes' => ceil($seconds / 60),
             ]),
         ]);
-    }   
+    }
     protected function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
-    }    
-    }; 
+    }
+    };
     ?>
-            <div class="flex flex-col gap-12">
-                                    <!-- Icono Plenaria -->
-     <!-- Icono Plenaria -->
-@php
-$faviconPath = \App\Models\Setting::get('logo_icon'); 
-$faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('default-favicon.ico');
 
-// Logo para el login
-$logoPath = \App\Models\Setting::get('logo_horizontal_background_solid');
-$logoUrl = $logoPath ? asset('storage/' . $logoPath) : null;
-@endphp
-<link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
-<link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">  
 
-        <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
-            <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">          
-                    <!-- Logo Responsive -->
-        <a href="{{ route('home') }}" class="flex items-center mb-6 gap-2 sm:gap-3 group">
-            @if($logoUrl)
-                <!-- Logo desde BD - Responsive -->
+<div class="flex flex-col gap-12">
+    <!-- Favicon -->
+    @php
+    $faviconPath = \App\Models\Setting::get('logo_icon');
+    $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('default-favicon.ico');
+    @endphp
+    <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
+
+    <section class="relative w-full h-screen overflow-hidden bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-600 animate-gradientBackground">
+        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 relative z-10">
+            <!-- Logo Responsive -->
+            <a href="{{ route('home') }}" class="flex items-center mb-6 gap-2 sm:gap-3 group">
+                <!-- Logo desde carpeta public -->
                 <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded shadow-lg animate-bounce overflow-hidden" style="animation-duration: 5s;">
-                    <img src="{{ $logoUrl }}" alt="Logo" class="w-full h-full object-contain">
+                    <img src="{{ asset('Plenaria.png') }}" alt="Logo Plenaria" class="w-full h-full object-contain">
                 </div>
-            @endif
-            
-            <span class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-wider text-white group-hover:text-gray-100 transition-all duration-300 -ml-1 sm:-ml-2 md:-ml-3 lg:-ml-4">
+
+                        <span class="logo-text text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white group-hover:text-gray-100 transition-all duration-300 -ml-1 sm:-ml-2 md:-ml-3 lg:-ml-4 drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
                 LENARIA
             </span>
-        </a>
-        <!-- Formulario -->
-        <div class="w-full bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl backdrop-blur-md md:mt-0 sm:max-w-md xl:p-0 transform transition-transform duration-700 ease-out animate-fadeIn scale-95 hover:scale-100">
-            <div class="p-6 space-y-6 md:space-y-8 sm:p-8">
-                <h1 class="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
-                    Inicia sesión en tu cuenta
-                </h1>
-                <form wire:submit="login" class="space-y-4 md:space-y-6">
-                    <!-- Email -->
-                    <div>
-                        <x-input label="Correo" id="email" type="email" wire:model="email" required
-                            placeholder="nombre@dominio.com"
-                            class="focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-300"/>
-                    </div>
+            </a>
 
-                    <!-- Password -->
-                    <div>
-                        <x-password label="Contraseña" id="password" type="password" wire:model="password" required
-                            placeholder="••••••••"
-                            class="focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-300"/>
-                    </div>
+            <!-- Formulario -->
+            <div class="w-full bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl backdrop-blur-md md:mt-0 sm:max-w-md xl:p-0 transform transition-transform duration-700 ease-out animate-fadeIn scale-95 hover:scale-100">
+                <div class="p-6 space-y-6 md:space-y-8 sm:p-8">
+                    <h1 class="text-2xl text-center font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+                        Inicia sesión en tu cuenta
+                    </h1>
+                    <form wire:submit="login" class="space-y-4 md:space-y-6">
+                        <!-- Email -->
+                        <div>
+                            <x-input label="Correo" id="email" type="email" wire:model="email" required
+                                placeholder="nombre@dominio.com"
+                                class="focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-300"/>
+                        </div>
 
-                    <!-- Recordarme -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-start">
-                            <div class="flex items-center h-5">
-                                <x-checkbox id="remember" aria-describedby="remember" type="checkbox" wire:model="remember" class="transition duration-300"/>
-                            </div>
-                            <div class="ml-3 text-sm">
-                                <label for="remember" class="text-gray-500 dark:text-gray-300">Recordarme</label>
+                        <!-- Password -->
+                        <div>
+                            <x-password label="Contraseña" id="password" type="password" wire:model="password" required
+                                placeholder="••••••••"
+                                class="focus:ring-2 focus:ring-blue-500 focus:shadow-lg transition-all duration-300"/>
+                        </div>
+
+                        <!-- Recordarme -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <x-checkbox id="remember" aria-describedby="remember" type="checkbox" wire:model="remember" class="transition duration-300"/>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="remember" class="text-gray-500 dark:text-gray-300">Recordarme</label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Botón Login -->
-                    <x-button info type="submit" class="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold px-6 py-2 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 animate-pulse" 
-                        label="Iniciar sesión" icon="arrow-right-end-on-rectangle" spinner/>
-                </form>
-            </div>
-            <!-- Theme Switcher -->
-            <div class="flex justify-center items-center mb-4">
-                <livewire:components.teme-switcher />
+                        <!-- Botón Login -->
+                        <x-button info type="submit" class="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white font-bold px-6 py-2 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-2xl active:scale-95 animate-pulse"
+                            label="Iniciar sesión" icon="arrow-right-end-on-rectangle" spinner/>
+                    </form>
+                </div>
+                <!-- Theme Switcher -->
+                <div class="flex justify-center items-center mb-4">
+                    <livewire:components.teme-switcher />
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 </div>
-
 @push('styles')
+<!-- Fuente moderna similar al logo -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+
 <style>
     /* Gradiente animado */
     @keyframes gradientBackground {
@@ -176,6 +176,12 @@ $logoUrl = $logoPath ? asset('storage/' . $logoPath) : null;
     .animate-float {
         animation: float 3s ease-in-out infinite;
     }
+
+    /* Estilo personalizado para LENARIA */
+    .logo-text {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+    }
 </style>
 @endpush
-

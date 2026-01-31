@@ -3,11 +3,13 @@ use Livewire\Volt\Component;
 use App\Models\DerechoDePalabra;
 use App\Models\Ciudadano;
 use App\Mail\ConfirmarDerechoPalabraMail;
+use App\Services\EvolutionService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Setting;
+use App\Models\Empresa;
 use Carbon\Carbon;
 
 new class extends Component
@@ -15,9 +17,18 @@ new class extends Component
     public $derechoPalabraId = null;
     public $ciudadanoId = null;
     public $email = '';
+    public $whatsapp = '';
     public $comision = '';
     public $estado = '';
     public $observaciones = '';
+
+    protected EvolutionService $evolutionService;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->evolutionService = app(EvolutionService::class);
+    }
 
     protected $listeners = [
         'abrir-confirmar-modal' => 'abrirConfirmarModal',
@@ -29,6 +40,7 @@ new class extends Component
             'estado' => 'required|in:pendiente,aprobada,rechazada',
             'observaciones' => 'required|string|max:1000',
             'email' => 'required|email',
+            'whatsapp' => 'nullable|string',
         ];
     }
 
@@ -65,11 +77,12 @@ new class extends Component
 
             $this->ciudadanoId = $derecho->ciudadano_id;
             $this->email = $derecho->ciudadano?->email ?? '';
+            $this->whatsapp = $derecho->ciudadano?->whatsapp ?? '';
             $this->comision = $derecho->comision?->nombre ?? '';
             $this->estado = '';
             $this->observaciones = '';
 
-            Log::info('Datos cargados - Email: ' . $this->email . ' - Comisión: ' . $this->comision);
+            Log::info('Datos cargados - Email: ' . $this->email . ' - WhatsApp: ' . $this->whatsapp . ' - Comisión: ' . $this->comision);
 
         } catch (\Exception $e) {
             Log::error('Error al abrir modal: ' . $e->getMessage());
@@ -103,11 +116,20 @@ new class extends Component
                 'fecha_respuesta' => now(),
             ]);
 
-            // Obtener el ciudadano para enviar el correo
+            // Obtener el ciudadano para enviar correo y WhatsApp
             $ciudadano = Ciudadano::findOrFail($this->ciudadanoId);
-            Mail::send(new ConfirmarDerechoPalabraMail($derecho, $ciudadano, $this->observaciones));
 
+            // Enviar correo a Mailtrap
+            Mail::send(new ConfirmarDerechoPalabraMail($derecho, $ciudadano, $this->observaciones));
             Log::info('Email enviado exitosamente a: ' . $ciudadano->email . ' para ID: ' . $this->derechoPalabraId);
+
+            // Enviar WhatsApp
+            try {
+                $this->enviarWhatsAppDerechoPalabra($ciudadano, $derecho);
+            } catch (\Exception $e) {
+                Log::warning('Error al enviar WhatsApp: ' . $e->getMessage());
+                // Continuar sin romper el flujo
+            }
 
             $this->dispatch('closeModal', name: 'confirmarModal');
             $this->dispatch('pg:eventRefresh-derecho-palabra-table');
@@ -115,7 +137,7 @@ new class extends Component
             $this->dispatch('showAlert', [
                 'icon' => 'success',
                 'title' => '¡Éxito!',
-                'text' => 'Solicitud confirmada y correo enviado correctamente.',
+                'text' => 'Solicitud confirmada y correo + WhatsApp enviados correctamente.',
                 'timer' => 2000,
                 'timerProgressBar' => true,
             ]);
@@ -137,6 +159,69 @@ new class extends Component
                 'text' => 'Ocurrió un error: ' . $e->getMessage(),
                 'timer' => 2500,
                 'timerProgressBar' => true,
+            ]);
+        }
+    }
+
+    /**
+     * Enviar WhatsApp de confirmación
+     */
+    private function enviarWhatsAppDerechoPalabra(Ciudadano $ciudadano, DerechoDePalabra $derecho)
+    {
+        // Obtener nombre de empresa
+        $empresa = Empresa::first();
+        $nombreEmpresa = $empresa && $empresa->razon_social ? $empresa->razon_social : 'Plenaria';
+
+        // Obtener sesión y comisión
+        $sesion = $derecho->sesionMunicipal;
+        $sesionTitulo = $sesion ? $sesion->titulo : 'Sesión Municipal';
+
+        $comision = null;
+        if ($derecho->comision_id) {
+            $comision = $derecho->comision;
+            $comision = $comision ? $comision->nombre : null;
+        }
+
+        // Construir mensaje según estado
+        if ($derecho->estado === 'aprobada') {
+            $mensaje = "✅ *¡Tu Derecho de Palabra ha sido APROBADO!*\n\n";
+            $mensaje .= "Estimado/a *{$ciudadano->nombre} {$ciudadano->apellido}*,\n\n";
+            $mensaje .= "¡Felicidades! Tu solicitud de derecho de palabra ha sido *APROBADA* por {$nombreEmpresa}.\n\n";
+            $mensaje .= "📋 *Sesión:* {$sesionTitulo}\n";
+            if ($comision) {
+                $mensaje .= "👥 *Comisión:* {$comision}\n";
+            }
+            $mensaje .= "\n";
+            $mensaje .= "💬 *Observaciones:* {$this->observaciones}\n\n";
+            $mensaje .= "Estamos listos para escuchar tu participación. Pronto nos comunicaremos con los detalles de la sesión.\n\n";
+            $mensaje .= "Agradecemos tu participación ciudadana.";
+        } else {
+            $mensaje = "⚠️ *Tu Derecho de Palabra ha sido RECHAZADO*\n\n";
+            $mensaje .= "Estimado/a *{$ciudadano->nombre} {$ciudadano->apellido}*,\n\n";
+            $mensaje .= "Lamentamos informarte que tu solicitud de derecho de palabra ha sido *RECHAZADA* por {$nombreEmpresa}.\n\n";
+            $mensaje .= "📋 *Sesión:* {$sesionTitulo}\n";
+            if ($comision) {
+                $mensaje .= "👥 *Comisión:* {$comision}\n";
+            }
+            $mensaje .= "\n";
+            $mensaje .= "💬 *Observaciones:* {$this->observaciones}\n\n";
+            $mensaje .= "Si consideras que hay un error, puedes presentar una apelación contactándonos directamente.\n\n";
+            $mensaje .= "Agradecemos tu comprensión.";
+        }
+
+        // Enviar por WhatsApp
+        $response = $this->evolutionService->sendMessage($ciudadano->whatsapp, $mensaje);
+
+        if (!$response['error']) {
+            Log::info('✅ WhatsApp de derecho de palabra enviado', [
+                'ciudadano_id' => $ciudadano->id,
+                'solicitud_id' => $derecho->id,
+                'estado' => $derecho->estado,
+            ]);
+        } else {
+            Log::warning('⚠️ Error al enviar WhatsApp de derecho de palabra', [
+                'ciudadano_id' => $ciudadano->id,
+                'error' => $response['message'] ?? 'Error desconocido',
             ]);
         }
     }
@@ -233,7 +318,7 @@ new class extends Component
 
     public function resetForm()
     {
-        $this->reset(['derechoPalabraId', 'ciudadanoId', 'email', 'comision', 'estado', 'observaciones']);
+        $this->reset(['derechoPalabraId', 'ciudadanoId', 'email', 'whatsapp', 'comision', 'estado', 'observaciones']);
         $this->resetValidation();
     }
 };
